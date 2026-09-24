@@ -7,13 +7,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { SafetyAlert } from "../../../components/common/SafetyAlert";
-import { Footer } from "../../../components/layout/Footer";
-import { PublicNavbar } from "../../../components/layout/PublicNavbar";
-import { StoreCard } from "../../../components/store/StoreCard";
-import { getStoresFn, type StoreDetailRecord } from "../../../server/listings";
+import { SafetyAlert } from "../components/common/SafetyAlert";
+import { Footer } from "../components/layout/Footer";
+import { PublicNavbar } from "../components/layout/PublicNavbar";
+import { StoreCard } from "../components/store/StoreCard";
+import { getStoresFn, type StoreDetailRecord } from "../server/listings";
 
-export const Route = createFileRoute("/app/store/")({
+export const Route = createFileRoute("/stores")({
   loader: async () => await getStoresFn(),
   component: StoresPage,
 });

@@ -1,0 +1,636 @@
+{
+  "info": {
+    "name": "Swappy API Collection",
+    "_postman_id": "c71a39f6-18ef-410c-99d7-5ef4c1a5b481",
+    "description": "Complete API Collection for Swappy Smartphone Marketplace & Classifieds. Importable into Bruno, Postman, and Insomnia.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8099",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "oqjv8ndew1iygtq",
+      "type": "string"
+    },
+    {
+      "key": "offerId",
+      "value": "4qdmvyl7d0qm41n",
+      "type": "string"
+    },
+    {
+      "key": "storeSlug",
+      "value": "apple-plug-ikeja",
+      "type": "string"
+    },
+    {
+      "key": "paystackRef",
+      "value": "swp_sub_chidi_test_01",
+      "type": "string"
+    },
+    {
+      "key": "itemSlug",
+      "value": "iphone-15-pro-max-256gb-natural-titanium-clean-us-used-dbajcw",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. System & Health",
+      "item": [
+        {
+          "name": "Marketplace Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/swappy/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "swappy", "status"]
+            }
+          }
+        },
+        {
+          "name": "PocketBase System Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Authentication & Profiles",
+      "item": [
+        {
+          "name": "Register New User (POST /api/auth/signup)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"seller@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"confirmPassword\": \"SecurePass123!\",\n  \"userName\": \"lagos_phone_plug\",\n  \"firstName\": \"Chidi\",\n  \"lastName\": \"Okonkwo\",\n  \"phone\": \"+2348012345678\",\n  \"sex\": \"male\",\n  \"age\": 28,\n  \"locationState\": \"Lagos\",\n  \"locationCity\": \"Ikeja\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Login User (PocketBase Auth)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identity\": \"seller@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/users/auth-with-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "users", "auth-with-password"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Profile (GET /api/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Smartphone Listings",
+      "item": [
+        {
+          "name": "Browse Catalog (Filtered Feed)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/items/records?filter=(status='active')&sort=-is_promoted,-created&expand=seller,store&page=1&perPage=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "items", "records"],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(status='active')"
+                },
+                {
+                  "key": "sort",
+                  "value": "-is_promoted,-created"
+                },
+                {
+                  "key": "expand",
+                  "value": "seller,store"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Item Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/items/records/{{itemId}}?expand=seller,store",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "items", "records", "{{itemId}}"],
+              "query": [
+                {
+                  "key": "expand",
+                  "value": "seller,store"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Item by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/items/records?filter=(slug='{{itemSlug}}')&expand=seller,store",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "items", "records"],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(slug='{{itemSlug}}')"
+                },
+                {
+                  "key": "expand",
+                  "value": "seller,store"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Smartphone Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seller\": \"YOUR_USER_ID\",\n  \"title\": \"iPhone 15 Pro 256GB Natural Titanium (Clean)\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 15 Pro\",\n  \"storage\": \"256GB\",\n  \"color\": \"Natural Titanium\",\n  \"battery_health\": 96,\n  \"condition\": \"flawless\",\n  \"carrier_status\": \"factory_unlocked\",\n  \"sim_type\": \"physical_sim_plus_esim\",\n  \"has_face_id\": true,\n  \"has_truetone\": true,\n  \"price\": 1250000,\n  \"accepts_swap\": true,\n  \"swap_preferences\": \"Willing to swap with iPhone 13 Pro or 14 Pro plus cash adjustment\",\n  \"location_state\": \"Lagos\",\n  \"location_city\": \"Ikeja\",\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/items/records",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "items", "records"]
+            }
+          }
+        },
+        {
+          "name": "Increment Item Views Count",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/items/{{itemId}}/view",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "{{itemId}}", "view"]
+            }
+          }
+        },
+        {
+          "name": "Update Listing Status (Owner/Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"pending_swap\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/items/{{itemId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "items", "{{itemId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Swap Negotiations",
+      "item": [
+        {
+          "name": "Propose Device Swap (POST /api/swap/propose)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetItemId\": \"{{itemId}}\",\n  \"offeredModel\": \"iPhone 13 Pro\",\n  \"offeredStorage\": \"128GB\",\n  \"offeredColor\": \"Sierra Blue\",\n  \"offeredBattery\": 86,\n  \"offeredCondition\": \"good\",\n  \"offeredIssues\": \"Tiny hairline scratch on bezel, all components genuine\",\n  \"cashAdjustment\": 350000,\n  \"message\": \"Ready for meetup at Computer Village or Ikeja Mall to verify both phones.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/swap/propose",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "swap", "propose"]
+            }
+          }
+        },
+        {
+          "name": "Respond to Swap Offer (Accept / Counter / Reject)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accept\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/swap/{{offerId}}/respond",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "swap", "{{offerId}}", "respond"]
+            }
+          }
+        },
+        {
+          "name": "List User Swap Offers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/swap_offers/records?expand=target_item,seller,proposer",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "swap_offers", "records"],
+              "query": [
+                {
+                  "key": "expand",
+                  "value": "target_item,seller,proposer"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Merchant Storefronts",
+      "item": [
+        {
+          "name": "Get Store by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/store/records?filter=(slug='{{storeSlug}}')",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "store", "records"],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(slug='{{storeSlug}}')"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Merchant Store",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"owner\": \"YOUR_USER_ID\",\n  \"name\": \"Apple Plug Ikeja\",\n  \"slug\": \"apple-plug-ikeja\",\n  \"description\": \"Direct UK & US used clean iPhones with warranty.\",\n  \"address\": \"Shop 14, Digital Bridge Complex, Otigba Street, Computer Village\",\n  \"city\": \"Ikeja\",\n  \"state\": \"Lagos\",\n  \"whatsapp\": \"+2348012345678\",\n  \"phone\": \"+2348012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/store/records",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "store", "records"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Watchlist & Favorites",
+      "item": [
+        {
+          "name": "Get My Saved Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/favorites/records?expand=item",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "favorites", "records"],
+              "query": [
+                {
+                  "key": "expand",
+                  "value": "item"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Watchlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": \"YOUR_USER_ID\",\n  \"item\": \"{{itemId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/favorites/records",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "favorites", "records"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Watchlist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/favorites/records/:favoriteId",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "collections",
+                "favorites",
+                "records",
+                ":favoriteId"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Reviews & Reputation",
+      "item": [
+        {
+          "name": "Get Seller Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/reviews/records?filter=(target_user='TARGET_USER_ID')&expand=author",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "reviews", "records"],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(target_user='TARGET_USER_ID')"
+                },
+                {
+                  "key": "expand",
+                  "value": "author"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Seller Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"YOUR_USER_ID\",\n  \"target_user\": \"TARGET_USER_ID\",\n  \"item\": \"{{itemId}}\",\n  \"rating\": 5,\n  \"comment\": \"Smooth swap transaction! The iPhone 15 Pro battery was truly at 96% and Face ID works flawlessly.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/reviews/records",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "collections", "reviews", "records"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Payments & Paystack (NGN)",
+      "item": [
+        {
+          "name": "Initialize Subscription Payment (Pro Seller)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"subscription\",\n  \"plan\": \"pro_seller\",\n  \"callbackUrl\": \"http://localhost:3000/payment/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "initialize"]
+            }
+          }
+        },
+        {
+          "name": "Initialize Promoted Ad Payment (Top Search 7D)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"promotion\",\n  \"itemId\": \"{{itemId}}\",\n  \"tier\": \"top_search_7d\",\n  \"callbackUrl\": \"http://localhost:3000/payment/callback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/initialize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "initialize"]
+            }
+          }
+        },
+        {
+          "name": "Verify Paystack Transaction (Callback Handshake)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reference\": \"{{paystackRef}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Paystack Webhook Listener",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-paystack-signature",
+                "value": "HMAC_SHA512_SIGNATURE"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"charge.success\",\n  \"data\": {\n    \"reference\": \"swp_sub_1700000000\",\n    \"status\": \"success\",\n    \"amount\": 1000000,\n    \"currency\": \"NGN\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "webhook"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
