@@ -13,13 +13,13 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { promoted, recent } = Route.useLoaderData();
+  const { promoted, recent, trendingCategories } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-base-100 text-base-content flex flex-col antialiased">
       <PublicNavbar />
       <main className="flex-1">
-        <HeroSection />
+        <HeroSection trendingCategories={trendingCategories} />
         {promoted && promoted.length > 0 && (
           <PromotedCarousel listings={promoted} />
         )}

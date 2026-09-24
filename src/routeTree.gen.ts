@@ -10,19 +10,30 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as StoresRouteImport } from './routes/stores'
 import { Route as AppAuthRouteRouteImport } from './routes/app/auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardStoresRouteImport } from './routes/dashboard/stores'
 import { Route as ItemsSlugRouteImport } from './routes/items/$slug'
 import { Route as StoreSlugRouteImport } from './routes/store/$slug'
 import { Route as AppStoreIndexRouteImport } from './routes/app/store/index'
+import { Route as DashboardPhonesIndexRouteImport } from './routes/dashboard/phones/index'
+import { Route as DashboardPhonesIdRouteImport } from './routes/dashboard/phones/$id'
+import { Route as DashboardPhonesNewRouteImport } from './routes/dashboard/phones/new'
 import { Route as AppAuthLoginIndexRouteImport } from './routes/app/auth/login.index'
 import { Route as AppAuthSignupIndexRouteImport } from './routes/app/auth/signup.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -41,9 +52,19 @@ const AppAuthRouteRoute = AppAuthRouteRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardStoresRoute = DashboardStoresRouteImport.update({
+  id: '/stores',
+  path: '/stores',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const ItemsSlugRoute = ItemsSlugRouteImport.update({
   id: '/items/$slug',
@@ -60,6 +81,21 @@ const AppStoreIndexRoute = AppStoreIndexRouteImport.update({
   path: '/app/store/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardPhonesIndexRoute = DashboardPhonesIndexRouteImport.update({
+  id: '/phones/',
+  path: '/phones/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardPhonesIdRoute = DashboardPhonesIdRouteImport.update({
+  id: '/phones/$id',
+  path: '/phones/$id',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardPhonesNewRoute = DashboardPhonesNewRouteImport.update({
+  id: '/phones/new',
+  path: '/phones/new',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const AppAuthLoginIndexRoute = AppAuthLoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
@@ -73,13 +109,19 @@ const AppAuthSignupIndexRoute = AppAuthSignupIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
+  '/dashboard/phones/new': typeof DashboardPhonesNewRoute
   '/app/store/': typeof AppStoreIndexRoute
+  '/dashboard/phones/': typeof DashboardPhonesIndexRoute
   '/app/auth/login/': typeof AppAuthLoginIndexRoute
   '/app/auth/signup/': typeof AppAuthSignupIndexRoute
 }
@@ -88,23 +130,34 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
+  '/dashboard/phones/new': typeof DashboardPhonesNewRoute
   '/app/store': typeof AppStoreIndexRoute
+  '/dashboard/phones': typeof DashboardPhonesIndexRoute
   '/app/auth/login': typeof AppAuthLoginIndexRoute
   '/app/auth/signup': typeof AppAuthSignupIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
+  '/dashboard/phones/new': typeof DashboardPhonesNewRoute
   '/app/store/': typeof AppStoreIndexRoute
+  '/dashboard/phones/': typeof DashboardPhonesIndexRoute
   '/app/auth/login/': typeof AppAuthLoginIndexRoute
   '/app/auth/signup/': typeof AppAuthSignupIndexRoute
 }
@@ -112,13 +165,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/settings'
+    | '/dashboard/stores'
     | '/items/$slug'
     | '/store/$slug'
     | '/dashboard/'
+    | '/dashboard/phones/$id'
+    | '/dashboard/phones/new'
     | '/app/store/'
+    | '/dashboard/phones/'
     | '/app/auth/login/'
     | '/app/auth/signup/'
   fileRoutesByTo: FileRoutesByTo
@@ -127,34 +186,45 @@ export interface FileRouteTypes {
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/settings'
+    | '/dashboard/stores'
     | '/items/$slug'
     | '/store/$slug'
     | '/dashboard'
+    | '/dashboard/phones/$id'
+    | '/dashboard/phones/new'
     | '/app/store'
+    | '/dashboard/phones'
     | '/app/auth/login'
     | '/app/auth/signup'
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/settings'
+    | '/dashboard/stores'
     | '/items/$slug'
     | '/store/$slug'
     | '/dashboard/'
+    | '/dashboard/phones/$id'
+    | '/dashboard/phones/new'
     | '/app/store/'
+    | '/dashboard/phones/'
     | '/app/auth/login/'
     | '/app/auth/signup/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   StoresRoute: typeof StoresRoute
   AppAuthRouteRoute: typeof AppAuthRouteRouteWithChildren
   ItemsSlugRoute: typeof ItemsSlugRoute
   StoreSlugRoute: typeof StoreSlugRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
   AppStoreIndexRoute: typeof AppStoreIndexRoute
 }
 
@@ -165,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -190,10 +267,24 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/': {
       id: '/dashboard/'
-      path: '/dashboard'
+      path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/stores': {
+      id: '/dashboard/stores'
+      path: '/stores'
+      fullPath: '/dashboard/stores'
+      preLoaderRoute: typeof DashboardStoresRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/items/$slug': {
       id: '/items/$slug'
@@ -216,6 +307,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStoreIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/phones/': {
+      id: '/dashboard/phones/'
+      path: '/phones'
+      fullPath: '/dashboard/phones/'
+      preLoaderRoute: typeof DashboardPhonesIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/phones/$id': {
+      id: '/dashboard/phones/$id'
+      path: '/phones/$id'
+      fullPath: '/dashboard/phones/$id'
+      preLoaderRoute: typeof DashboardPhonesIdRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/phones/new': {
+      id: '/dashboard/phones/new'
+      path: '/phones/new'
+      fullPath: '/dashboard/phones/new'
+      preLoaderRoute: typeof DashboardPhonesNewRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/app/auth/login/': {
       id: '/app/auth/login/'
       path: '/login'
@@ -233,6 +345,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteRouteChildren {
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardStoresRoute: typeof DashboardStoresRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardPhonesIdRoute: typeof DashboardPhonesIdRoute
+  DashboardPhonesNewRoute: typeof DashboardPhonesNewRoute
+  DashboardPhonesIndexRoute: typeof DashboardPhonesIndexRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardStoresRoute: DashboardStoresRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardPhonesIdRoute: DashboardPhonesIdRoute,
+  DashboardPhonesNewRoute: DashboardPhonesNewRoute,
+  DashboardPhonesIndexRoute: DashboardPhonesIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
 interface AppAuthRouteRouteChildren {
   AppAuthLoginIndexRoute: typeof AppAuthLoginIndexRoute
   AppAuthSignupIndexRoute: typeof AppAuthSignupIndexRoute
@@ -249,12 +383,12 @@ const AppAuthRouteRouteWithChildren = AppAuthRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   ExploreRoute: ExploreRoute,
   StoresRoute: StoresRoute,
   AppAuthRouteRoute: AppAuthRouteRouteWithChildren,
   ItemsSlugRoute: ItemsSlugRoute,
   StoreSlugRoute: StoreSlugRoute,
-  DashboardIndexRoute: DashboardIndexRoute,
   AppStoreIndexRoute: AppStoreIndexRoute,
 }
 export const routeTree = rootRouteImport

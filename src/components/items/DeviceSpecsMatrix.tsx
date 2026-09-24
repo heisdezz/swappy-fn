@@ -105,32 +105,32 @@ export function DeviceSpecsMatrix({ item }: DeviceSpecsMatrixProps) {
   ];
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <Shield className="w-4 h-4 text-primary" />
-        <h3 className="text-sm font-bold uppercase tracking-wider text-base-content/80">
+    <div className="space-y-4">
+      <div className="flex items-center gap-2.5">
+        <Shield className="w-5 h-5 text-primary" />
+        <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider text-base-content/85">
           Hardware & Diagnostic Transparency
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         {specs.map((spec) => {
           const Icon = spec.icon;
           return (
             <div
               key={spec.label}
-              className="bg-base-200/60 p-3 rounded-2xl border border-base-300 space-y-1.5 flex flex-col justify-between"
+              className="bg-base-200/60 p-4 rounded-2xl border border-base-300 space-y-2 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-base-content/60">
+                <span className="text-xs sm:text-sm font-bold text-base-content/65">
                   {spec.label}
                 </span>
-                <Icon className={`w-3.5 h-3.5 ${spec.badgeClass}`} />
+                <Icon className={`w-4 h-4 ${spec.badgeClass}`} />
               </div>
 
-              <div className="text-xs font-extrabold text-base-content leading-tight flex items-center gap-1">
+              <div className="text-sm sm:text-base font-extrabold text-base-content leading-snug flex items-center gap-1.5">
                 {spec.badgeClass.includes("text-success") && (
-                  <CheckCircle2 className="w-3 h-3 text-success flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
                 )}
                 <span className="truncate">{spec.value}</span>
               </div>

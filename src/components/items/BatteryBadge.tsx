@@ -5,7 +5,10 @@ interface BatteryBadgeProps {
   className?: string;
 }
 
-export function BatteryBadge({ percentage, className = "" }: BatteryBadgeProps) {
+export function BatteryBadge({
+  percentage,
+  className = "",
+}: BatteryBadgeProps) {
   if (percentage === undefined || percentage === null) {
     return null;
   }
@@ -26,10 +29,10 @@ export function BatteryBadge({ percentage, className = "" }: BatteryBadgeProps) 
 
   return (
     <span
-      className={`badge badge-sm font-semibold inline-flex items-center gap-1 ${badgeColor} ${className}`}
+      className={`badge badge-sm font-bold text-xs inline-flex items-center gap-1.5 px-2.5 py-1 ${badgeColor} ${className}`}
       title={`Battery Health: ${percentage}%`}
     >
-      <Icon className="w-3 h-3" />
+      <Icon className="w-3.5 h-3.5" />
       <span>{percentage}%</span>
     </span>
   );

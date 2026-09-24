@@ -53,13 +53,13 @@ export function PublicNavbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-base-100/90 backdrop-blur border-b border-base-200">
-      <div className="container mx-auto px-4">
-        <div className="navbar min-h-16 px-0 gap-3">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="navbar min-h-18 px-0 gap-4 sm:gap-8">
           {/* Brand */}
-          <div className="flex-1 flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-3.5">
             <Link
               to="/"
-              className="flex items-center gap-2 text-xl font-black tracking-tight"
+              className="flex items-center gap-2.5 text-xl font-black tracking-tight"
             >
               <span className="w-9 h-9 rounded-xl bg-primary text-primary-content flex items-center justify-center font-black shadow-sm">
                 <ArrowLeftRight className="w-5 h-5 stroke-[2.5]" />
@@ -69,33 +69,37 @@ export function PublicNavbar() {
               </span>
             </Link>
 
-            <span className="hidden md:inline-flex badge badge-sm badge-neutral font-medium">
+            <span className="hidden md:inline-flex badge badge-sm badge-neutral font-medium ml-1">
               iPhone Marketplace
             </span>
           </div>
 
-          {/* Quick Nav Links */}
-          <nav className="flex items-center gap-1">
+          {/* Quick Nav Links with generous spacing */}
+          <nav className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/explore"
-              activeProps={{ className: "btn-active font-bold text-primary" }}
-              className="btn btn-ghost btn-sm text-sm font-semibold rounded-lg inline-flex items-center gap-1.5"
+              activeProps={{
+                className: "btn-active font-bold text-primary bg-primary/10",
+              }}
+              className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl inline-flex items-center gap-2"
             >
               <Compass className="w-4 h-4 text-primary" />
               <span>Explore</span>
             </Link>
             <Link
               to="/stores"
-              activeProps={{ className: "btn-active font-bold text-accent" }}
-              className="btn btn-ghost btn-sm text-sm font-semibold rounded-lg hidden sm:inline-flex items-center gap-1.5"
+              activeProps={{
+                className: "btn-active font-bold text-accent bg-accent/10",
+              }}
+              className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl hidden sm:inline-flex items-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-accent" />
               <span>Verified Stores</span>
             </Link>
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Actions with increased breathing room */}
+          <div className="flex items-center gap-3 sm:gap-4 pl-1">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -117,7 +121,7 @@ export function PublicNavbar() {
                   ? ("/dashboard" as string)
                   : ("/app/auth/login?redirect=/dashboard" as string)
               }
-              className="btn btn-primary btn-sm rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm"
+              className="btn btn-primary btn-sm h-10 px-4 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm text-xs sm:text-sm"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span className="hidden xs:inline">Post Listing</span>
@@ -135,12 +139,12 @@ export function PublicNavbar() {
                 </div>
                 <ul
                   tabIndex={0}
-                  className="dropdown-content menu menu-sm bg-base-100 rounded-2xl z-50 w-52 p-2 shadow-xl border border-base-300 mt-2 space-y-1"
+                  className="dropdown-content menu menu-sm bg-base-100 rounded-2xl z-50 w-56 p-3 shadow-xl border border-base-300 mt-2 space-y-1.5"
                 >
                   <li>
                     <Link
                       to={"/dashboard" as string}
-                      className="font-bold inline-flex items-center gap-2"
+                      className="font-bold py-2.5 inline-flex items-center gap-2.5 rounded-xl"
                     >
                       <LayoutDashboard className="w-4 h-4 text-primary" />
                       <span>Dashboard</span>
@@ -149,17 +153,17 @@ export function PublicNavbar() {
                   <li>
                     <Link
                       to="/stores"
-                      className="inline-flex items-center gap-2"
+                      className="py-2.5 inline-flex items-center gap-2.5 rounded-xl"
                     >
                       <ShieldCheck className="w-4 h-4 text-accent" />
                       <span>Verified Stores</span>
                     </Link>
                   </li>
-                  <div className="divider my-1" />
+                  <div className="divider my-1.5" />
                   <li>
                     <button
                       onClick={handleSignOut}
-                      className="text-error font-semibold inline-flex items-center gap-2"
+                      className="text-error font-semibold py-2.5 inline-flex items-center gap-2.5 rounded-xl"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
@@ -170,7 +174,7 @@ export function PublicNavbar() {
             ) : (
               <Link
                 to={"/app/auth/login" as string}
-                className="btn btn-ghost btn-sm text-sm font-semibold rounded-xl"
+                className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl"
               >
                 Sign In
               </Link>

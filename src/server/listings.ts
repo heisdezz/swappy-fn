@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSSRClient } from "../client/pb";
 import type { ItemCardRecord } from "../components/items/ItemCard";
+import type {
+  CategoryRecord,
+  CategoryTrendingResponse,
+} from "../types/categories";
 import { extractIdFromSlug } from "../utils/slug";
 
 export interface ItemDetailRecord extends ItemCardRecord {
@@ -13,6 +17,7 @@ export interface ItemDetailRecord extends ItemCardRecord {
   description?: string;
   issues?: string;
   views?: number;
+  category?: string;
   seller?: {
     id: string;
     name: string;
@@ -139,6 +144,7 @@ function sanitizeDetailRecord(item: Record<string, unknown>): ItemDetailRecord {
     description: item.description ? String(item.description) : undefined,
     issues: item.issues ? String(item.issues) : undefined,
     views: typeof item.views === "number" ? item.views : 142,
+    category: item.category ? String(item.category) : undefined,
     seller: {
       id: seller?.id ? String(seller.id) : "usr-seller-1",
       name: sellerName,
@@ -164,27 +170,82 @@ function sanitizeDetailRecord(item: Record<string, unknown>): ItemDetailRecord {
   };
 }
 
+export const getTrendingCategoriesFn = createServerFn({
+  method: "GET",
+}).handler(async (): Promise<CategoryTrendingResponse | null> => {
+  const backendUrl =
+    process.env.POCKETBASE_URL ||
+    process.env.VITE_POCKETBASE_URL ||
+    "http://127.0.0.1:8090";
+
+  try {
+    const res = await fetch(`${backendUrl}/api/categories/trending`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) {
+      console.warn("Could not load trending categories, status:", res.status);
+      return null;
+    }
+    const data = (await res.json()) as CategoryTrendingResponse;
+    return data;
+  } catch (err) {
+    console.error("Error fetching trending categories:", err);
+    return null;
+  }
+});
+
+export const getCategoriesFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<CategoryRecord[]> => {
+    const client = getSSRClient();
+    try {
+      const records = await client.collection("categories").getFullList({
+        sort: "sort_order",
+        filter: "is_active = true",
+        requestKey: null,
+      });
+
+      return records.map((c) => ({
+        id: String(c.id),
+        name: String(c.name),
+        slug: String(c.slug),
+        series: String(c.series || ""),
+        variant: String(c.variant || "base"),
+        release_year: Number(c.release_year || 2020),
+        icon: c.icon ? String(c.icon) : "smartphone",
+        description: c.description ? String(c.description) : undefined,
+        sort_order: Number(c.sort_order || 0),
+        is_active: Boolean(c.is_active),
+      }));
+    } catch (err) {
+      console.error("Failed to load categories list:", err);
+      return [];
+    }
+  },
+);
+
 export const getHomepageDataFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
     promoted: ItemCardRecord[];
     recent: ItemCardRecord[];
+    trendingCategories: CategoryTrendingResponse | null;
   }> => {
-    const pb = getSSRClient();
+    const pbClient = getSSRClient();
 
     try {
-      const [promotedRes, recentRes] = await Promise.all([
-        pb.collection("items").getList(1, 8, {
+      const [promotedRes, recentRes, trendingCategories] = await Promise.all([
+        pbClient.collection("items").getList(1, 8, {
           filter: 'is_promoted = true && status = "active"',
           sort: "-created",
           expand: "seller,store",
           requestKey: null,
         }),
-        pb.collection("items").getList(1, 12, {
+        pbClient.collection("items").getList(1, 12, {
           filter: 'status = "active"',
           sort: "-created",
           expand: "seller,store",
           requestKey: null,
         }),
+        getTrendingCategoriesFn(),
       ]);
 
       return {
@@ -194,19 +255,21 @@ export const getHomepageDataFn = createServerFn({ method: "GET" }).handler(
         recent: (recentRes.items || []).map((item) =>
           sanitizeRecord(item as unknown as Record<string, unknown>),
         ),
+        trendingCategories,
       };
     } catch (error) {
       console.error("PocketBase getHomepageDataFn query error:", error);
       return {
         promoted: [],
         recent: [],
+        trendingCategories: null,
       };
     }
   },
 );
 
 export const getItemBySlugFn = createServerFn({ method: "GET" })
-  .validator((data: { slug: string }) => data)
+  .validator((d: { slug: string }) => d)
   .handler(
     async ({
       data,
@@ -214,68 +277,64 @@ export const getItemBySlugFn = createServerFn({ method: "GET" })
       item: ItemDetailRecord | null;
       relatedItems: ItemCardRecord[];
     }> => {
-      const { slug } = data;
-      const pb = getSSRClient();
+      const pbClient = getSSRClient();
+      const extractedId = extractIdFromSlug(data.slug);
 
       try {
-        let record: Record<string, unknown> | null = null;
-        const directId = extractIdFromSlug(slug);
+        let rawItem: Record<string, unknown> | null = null;
 
-        if (directId) {
+        // Try direct ID lookup if slug matches PocketBase 15-char ID
+        if (extractedId && extractedId.length === 15) {
           try {
-            const res = await pb.collection("items").getOne(directId, {
+            rawItem = (await pbClient.collection("items").getOne(extractedId, {
               expand: "seller,store",
               requestKey: null,
-            });
-            if (res) {
-              record = res as unknown as Record<string, unknown>;
-            }
+            })) as unknown as Record<string, unknown>;
           } catch {
-            // Direct ID lookup missed, continue to query search
+            rawItem = null;
           }
         }
 
-        if (!record) {
-          const cleaned = slug.replace(/[-_]/g, " ").trim();
-          const res = await pb
-            .collection("items")
-            .getFirstListItem(`title ~ "${cleaned}" || model ~ "${cleaned}"`, {
-              expand: "seller,store",
-              requestKey: null,
-            });
-          if (res) {
-            record = res as unknown as Record<string, unknown>;
-          }
-        }
-
-        if (record) {
-          const detail = sanitizeDetailRecord(record);
-
-          const related = await pb.collection("items").getList(1, 4, {
-            filter: `id != "${record.id}" && status = "active"`,
-            sort: "-created",
+        // If not found by direct ID, search by slug
+        if (!rawItem) {
+          const listRes = await pbClient.collection("items").getList(1, 1, {
+            filter: `slug = "${data.slug}"`,
             expand: "seller,store",
             requestKey: null,
           });
 
-          return {
-            item: detail,
-            relatedItems: (related.items || []).map((r) =>
-              sanitizeRecord(r as unknown as Record<string, unknown>),
-            ),
-          };
+          if (listRes.items.length > 0) {
+            rawItem = listRes.items[0] as unknown as Record<string, unknown>;
+          }
         }
-      } catch (error) {
-        console.error(
-          `PocketBase getItemBySlugFn query error for slug '${slug}':`,
-          error,
-        );
-      }
 
-      return {
-        item: null,
-        relatedItems: [],
-      };
+        if (!rawItem) {
+          return { item: null, relatedItems: [] };
+        }
+
+        const item = sanitizeDetailRecord(rawItem);
+
+        // Fetch related devices
+        let relatedItems: ItemCardRecord[] = [];
+        try {
+          const relatedRes = await pbClient.collection("items").getList(1, 4, {
+            filter: `id != "${item.id}" && status = "active"`,
+            sort: "-created",
+            expand: "seller,store",
+            requestKey: null,
+          });
+          relatedItems = (relatedRes.items || []).map((rel) =>
+            sanitizeRecord(rel as unknown as Record<string, unknown>),
+          );
+        } catch (e) {
+          console.warn("Could not query related items:", e);
+        }
+
+        return { item, relatedItems };
+      } catch (err) {
+        console.error("Error in getItemBySlugFn:", err);
+        return { item: null, relatedItems: [] };
+      }
     },
   );
 
@@ -418,5 +477,90 @@ export const getStoreBySlugFn = createServerFn({ method: "GET" })
         store: null,
         inventory: [],
       };
+    },
+  );
+
+export const getCatalogItemsFn = createServerFn({ method: "GET" })
+  .validator(
+    (d: {
+      category?: string;
+      model?: string;
+      storage?: string;
+      condition?: string;
+      carrier?: string;
+      minBattery?: number;
+      acceptsSwap?: boolean;
+      search?: string;
+      sort?: string;
+    }) => d,
+  )
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      items: ItemCardRecord[];
+      totalCount: number;
+    }> => {
+      const pbClient = getSSRClient();
+
+      const filterParts: string[] = ['status = "active"'];
+
+      if (data.category) {
+        filterParts.push(`category.slug = "${data.category}"`);
+      } else if (data.model) {
+        filterParts.push(
+          `(model ~ "${data.model}" || title ~ "${data.model}")`,
+        );
+      }
+
+      if (data.storage) {
+        filterParts.push(`storage = "${data.storage}"`);
+      }
+
+      if (data.condition) {
+        filterParts.push(`condition = "${data.condition}"`);
+      }
+
+      if (data.carrier) {
+        filterParts.push(`carrier_status = "${data.carrier}"`);
+      }
+
+      if (typeof data.minBattery === "number" && data.minBattery > 0) {
+        filterParts.push(`battery_health >= ${data.minBattery}`);
+      }
+
+      if (data.acceptsSwap) {
+        filterParts.push(`accepts_swap = true`);
+      }
+
+      if (data.search) {
+        filterParts.push(
+          `(title ~ "${data.search}" || description ~ "${data.search}" || color ~ "${data.search}")`,
+        );
+      }
+
+      let sortClause = "-created";
+      if (data.sort === "price_asc") sortClause = "price, -created";
+      if (data.sort === "price_desc") sortClause = "-price, -created";
+      if (data.sort === "promoted") sortClause = "-is_promoted, -created";
+
+      try {
+        const res = await pbClient.collection("items").getList(1, 50, {
+          filter: filterParts.join(" && "),
+          sort: sortClause,
+          expand: "seller,store,category",
+          requestKey: null,
+        });
+
+        return {
+          items: (res.items || []).map((item) =>
+            sanitizeRecord(item as unknown as Record<string, unknown>),
+          ),
+          totalCount: res.totalItems,
+        };
+      } catch (err) {
+        console.error("getCatalogItemsFn query error:", err);
+        return { items: [], totalCount: 0 };
+      }
     },
   );

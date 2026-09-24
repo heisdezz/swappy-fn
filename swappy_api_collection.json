@@ -53,8 +53,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/swappy/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "swappy", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "swappy",
+                "status"
+              ]
             }
           }
         },
@@ -65,8 +71,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
             }
           }
         }
@@ -91,8 +102,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/signup",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "signup"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "signup"
+              ]
             }
           }
         },
@@ -112,8 +129,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/collections/users/auth-with-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "users", "auth-with-password"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "users",
+                "auth-with-password"
+              ]
             }
           }
         },
@@ -129,8 +153,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
             }
           }
         }
@@ -146,8 +176,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/collections/items/records?filter=(status='active')&sort=-is_promoted,-created&expand=seller,store&page=1&perPage=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "items", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "items",
+                "records"
+              ],
               "query": [
                 {
                   "key": "filter",
@@ -180,8 +217,16 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/collections/items/records/{{itemId}}?expand=seller,store",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "items", "records", "{{itemId}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "items",
+                "records",
+                "{{itemId}}"
+              ],
               "query": [
                 {
                   "key": "expand",
@@ -198,8 +243,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/collections/items/records?filter=(slug='{{itemSlug}}')&expand=seller,store",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "items", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "items",
+                "records"
+              ],
               "query": [
                 {
                   "key": "filter",
@@ -233,8 +285,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/collections/items/records",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "items", "records"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "items",
+                "records"
+              ]
             }
           }
         },
@@ -245,8 +304,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/items/{{itemId}}/view",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "items", "{{itemId}}", "view"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "{{itemId}}",
+                "view"
+              ]
             }
           }
         },
@@ -270,8 +336,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/items/{{itemId}}/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "items", "{{itemId}}", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "items",
+                "{{itemId}}",
+                "status"
+              ]
             }
           }
         }
@@ -300,8 +373,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/swap/propose",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "swap", "propose"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "swap",
+                "propose"
+              ]
             }
           }
         },
@@ -325,8 +404,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/swap/{{offerId}}/respond",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "swap", "{{offerId}}", "respond"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "swap",
+                "{{offerId}}",
+                "respond"
+              ]
             }
           }
         },
@@ -342,8 +428,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/collections/swap_offers/records?expand=target_item,seller,proposer",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "swap_offers", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "swap_offers",
+                "records"
+              ],
               "query": [
                 {
                   "key": "expand",
@@ -365,8 +458,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/collections/store/records?filter=(slug='{{storeSlug}}')",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "store", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "store",
+                "records"
+              ],
               "query": [
                 {
                   "key": "filter",
@@ -396,8 +496,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/collections/store/records",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "store", "records"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "store",
+                "records"
+              ]
             }
           }
         }
@@ -418,8 +525,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/collections/favorites/records?expand=item",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "favorites", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "favorites",
+                "records"
+              ],
               "query": [
                 {
                   "key": "expand",
@@ -449,8 +563,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/collections/favorites/records",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "favorites", "records"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "favorites",
+                "records"
+              ]
             }
           }
         },
@@ -466,7 +587,9 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/collections/favorites/records/:favoriteId",
-              "host": ["{{baseUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "api",
                 "collections",
@@ -489,8 +612,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/collections/reviews/records?filter=(target_user='TARGET_USER_ID')&expand=author",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "reviews", "records"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "reviews",
+                "records"
+              ],
               "query": [
                 {
                   "key": "filter",
@@ -524,8 +654,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/collections/reviews/records",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "collections", "reviews", "records"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "reviews",
+                "records"
+              ]
             }
           }
         }
@@ -554,8 +691,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/payments/initialize",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "payments", "initialize"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "initialize"
+              ]
             }
           }
         },
@@ -579,8 +722,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/payments/initialize",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "payments", "initialize"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "initialize"
+              ]
             }
           }
         },
@@ -600,8 +749,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/payments/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "payments", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "verify"
+              ]
             }
           }
         },
@@ -625,8 +780,448 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/payments/webhook",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "payments", "webhook"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "webhook"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Stats & Analytics",
+      "item": [
+        {
+          "name": "Track Item Visit (by Slug or ID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/items/{{itemSlug}}/visit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "items",
+                "{{itemSlug}}",
+                "visit"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Track Phone Number Copied (by Slug or ID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/items/{{itemSlug}}/copied",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "items",
+                "{{itemSlug}}",
+                "copied"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Item Analytics (by Slug or ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/items/{{itemSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "items",
+                "{{itemSlug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Analytics Records (PocketBase Collection API)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/analytics/records?expand=item&page=1&perPage=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "analytics",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "expand",
+                  "value": "item"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Trending Categories & Highlights",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/categories/trending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "categories",
+                "trending"
+              ]
+            }
+          }
+        },
+        {
+          "name": "All Categories Analytics Breakdown",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Single Category Deep-Dive by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/analytics/categories/iphone-15-pro-max",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "analytics",
+                "categories",
+                "iphone-15-pro-max"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Category Trending Alias (GET /api/categories/trending)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/trending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "trending"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Item Chat (Authenticated)",
+      "item": [
+        {
+          "name": "Send Message to Chatroom (by Slug or ID)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello! Is this iPhone still available for physical inspection?\",\n  \"recipient\": \"{{sellerId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/{{itemSlug}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "{{itemSlug}}",
+                "messages"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Chat Messages (by Slug or ID)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/{{itemSlug}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "{{itemSlug}}",
+                "messages"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Direct Messages Collection Query (PocketBase API)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/messages/records?filter=(chatroom='{{itemSlug}}')&expand=sender,recipient,item&sort=created",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "messages",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(chatroom='{{itemSlug}}')"
+                },
+                {
+                  "key": "expand",
+                  "value": "sender,recipient,item"
+                },
+                {
+                  "key": "sort",
+                  "value": "created"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Device Categories (iPhone Models)",
+      "item": [
+        {
+          "name": "List All Categories (Ordered by Generation)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/categories/records?sort=sort_order&page=1&perPage=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "categories",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "sort_order"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "perPage",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter Categories by Series (e.g. iPhone 15)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/categories/records?filter=(series='iPhone 15')&sort=sort_order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "categories",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(series='iPhone 15')"
+                },
+                {
+                  "key": "sort",
+                  "value": "sort_order"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter Categories by Variant (e.g. Pro & Pro Max)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/categories/records?filter=(variant='pro' || variant='pro_max')&sort=sort_order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "categories",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(variant='pro' || variant='pro_max')"
+                },
+                {
+                  "key": "sort",
+                  "value": "sort_order"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Category by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/categories/records?filter=(slug='iphone-15-pro-max')",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "categories",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(slug='iphone-15-pro-max')"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Query Items by Category Relation (Accurate & Fast)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/collections/items/records?filter=(category.slug='iphone-15-pro-max' && status='active')&expand=category,seller,store&sort=-created",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "collections",
+                "items",
+                "records"
+              ],
+              "query": [
+                {
+                  "key": "filter",
+                  "value": "(category.slug='iphone-15-pro-max' && status='active')"
+                },
+                {
+                  "key": "expand",
+                  "value": "category,seller,store"
+                },
+                {
+                  "key": "sort",
+                  "value": "-created"
+                }
+              ]
             }
           }
         }

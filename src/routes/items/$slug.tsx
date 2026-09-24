@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -18,6 +18,7 @@ import { ImageGallery } from "../../components/items/ImageGallery";
 import { DeviceSpecsMatrix } from "../../components/items/DeviceSpecsMatrix";
 import { SellerContactCard } from "../../components/items/SellerContactCard";
 import { SwapModal } from "../../components/items/SwapModal";
+import { ItemChatDrawer } from "../../components/items/ItemChatDrawer";
 import { ItemGrid } from "../../components/items/ItemGrid";
 import { BatteryBadge } from "../../components/items/BatteryBadge";
 import { ConditionBadge } from "../../components/items/ConditionBadge";
@@ -32,6 +33,24 @@ export const Route = createFileRoute("/items/$slug")({
 function ItemDetailPage() {
   const { item, relatedItems } = Route.useLoaderData();
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
+  const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
+
+  // Trigger non-blocking visit analytics on mount
+  useEffect(() => {
+    if (item?.id) {
+      const backendUrl =
+        import.meta.env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
+      fetch(
+        `${backendUrl}/api/analytics/items/${encodeURIComponent(item.id)}/visit`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        },
+      ).catch(() => {
+        // Non-blocking visit increment
+      });
+    }
+  }, [item?.id]);
 
   if (!item) {
     return (
@@ -51,7 +70,7 @@ function ItemDetailPage() {
             </p>
           </div>
           <Link
-            to={"/explore" as string}
+            to="/explore"
             className="btn btn-primary rounded-xl font-bold px-6 text-sm"
           >
             Browse Available iPhones
@@ -73,10 +92,7 @@ function ItemDetailPage() {
             Home
           </Link>
           <ChevronRight className="w-3.5 h-3.5" />
-          <Link
-            to={"/explore" as string}
-            className="hover:text-primary transition-colors"
-          >
+          <Link to="/explore" className="hover:text-primary transition-colors">
             iPhones
           </Link>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -88,7 +104,7 @@ function ItemDetailPage() {
         {/* Back Button */}
         <div>
           <Link
-            to={"/explore" as string}
+            to="/explore"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-base-content/70 hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -187,19 +203,19 @@ function ItemDetailPage() {
               </div>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-base-content/75">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                   <span>Confirm Settings Battery Health percentage</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                   <span>Sign in and test iCloud activation status</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                   <span>Test front and rear camera focus</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-success flex-shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-success shrink-0" />
                   <span>Insert local SIM and test phone call audio</span>
                 </li>
               </ul>
@@ -211,6 +227,7 @@ function ItemDetailPage() {
             <SellerContactCard
               item={item}
               onOpenSwapModal={() => setIsSwapModalOpen(true)}
+              onOpenChatDrawer={() => setIsChatDrawerOpen(true)}
             />
 
             <SafetyAlert />
@@ -231,7 +248,7 @@ function ItemDetailPage() {
               </div>
 
               <Link
-                to={"/explore" as string}
+                to="/explore"
                 className="text-xs font-bold text-primary hover:underline"
               >
                 View all in catalog
@@ -243,14 +260,26 @@ function ItemDetailPage() {
         )}
       </main>
 
-      {/* Device Swap Modal */}
-      <SwapModal
-        isOpen={isSwapModalOpen}
-        onClose={() => setIsSwapModalOpen(false)}
-        targetItem={item}
-      />
-
       <Footer />
+
+      {/* Trade-In Proposal Modal */}
+      {item.accepts_swap && (
+        <SwapModal
+          isOpen={isSwapModalOpen}
+          onClose={() => setIsSwapModalOpen(false)}
+          targetItem={item}
+        />
+      )}
+
+      {/* Authenticated In-Page Chat Drawer */}
+      <ItemChatDrawer
+        isOpen={isChatDrawerOpen}
+        onClose={() => setIsChatDrawerOpen(false)}
+        itemIdentifier={item.id}
+        itemTitle={item.title || "iPhone"}
+        sellerName={item.seller?.name || "Seller"}
+        sellerId={item.seller?.id}
+      />
     </div>
   );
 }

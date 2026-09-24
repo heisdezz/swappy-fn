@@ -34,40 +34,40 @@ export function TradeFeatureSection() {
   ];
 
   return (
-    <section className="py-12 bg-base-200/50 border-y border-base-200">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center space-y-3 mb-10">
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-base-content">
+    <section className="py-14 sm:py-16 bg-base-200/50 border-y border-base-200">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto text-center space-y-3 mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-base-content">
             How Device Swapping Works
           </h2>
-          <p className="text-sm sm:text-base text-base-content/75">
+          <p className="text-base sm:text-lg text-base-content/75 leading-relaxed">
             Transparent peer-to-peer trade-ins designed specifically for iPhone
             upgrades and downgrades without middlemen fees.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {steps.map((item) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.step}
-                className="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm flex flex-col justify-between"
+                className="bg-base-100 p-6 rounded-3xl border border-base-300 shadow-xs flex flex-col justify-between"
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="w-10 h-10 rounded-xl bg-primary/20 text-base-content flex items-center justify-center font-black">
+                    <span className="w-11 h-11 rounded-2xl bg-primary/20 text-base-content flex items-center justify-center font-black">
                       <Icon className="w-5 h-5 text-base-content" />
                     </span>
-                    <span className="badge badge-neutral badge-xs font-mono font-bold">
+                    <span className="badge badge-neutral badge-sm font-mono font-bold text-xs px-2.5 py-1">
                       {item.step}
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-base text-base-content">
+                  <h3 className="font-extrabold text-base sm:text-lg text-base-content">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-base-content/70 leading-relaxed">
+                  <p className="text-sm leading-relaxed text-base-content/75 font-medium">
                     {item.description}
                   </p>
                 </div>
@@ -76,10 +76,10 @@ export function TradeFeatureSection() {
           })}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-10 text-center">
           <Link
             to={"/explore" as string}
-            className="btn btn-primary rounded-xl font-bold px-8 shadow-sm"
+            className="btn btn-primary btn-md rounded-2xl font-bold px-8 shadow-sm text-sm sm:text-base"
           >
             Find Swap Opportunities
           </Link>
