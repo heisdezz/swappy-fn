@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeftRight,
   Compass,
+  Heart,
   LayoutDashboard,
   LogOut,
   Moon,
@@ -12,10 +13,12 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { pb } from "../../client/pb";
+import { useWatchlist } from "../../helpers/watchlist";
 
 export function PublicNavbar() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { count: savedCount } = useWatchlist();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export function PublicNavbar() {
               activeProps={{
                 className: "btn-active font-bold text-primary bg-primary/10",
               }}
-              className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl inline-flex items-center gap-2"
+              className="btn btn-ghost btn-sm h-10 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl inline-flex items-center gap-2"
             >
               <Compass className="w-4 h-4 text-primary" />
               <span>Explore</span>
@@ -91,10 +94,25 @@ export function PublicNavbar() {
               activeProps={{
                 className: "btn-active font-bold text-accent bg-accent/10",
               }}
-              className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl hidden sm:inline-flex items-center gap-2"
+              className="btn btn-ghost btn-sm h-10 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl hidden sm:inline-flex items-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-accent" />
               <span>Verified Stores</span>
+            </Link>
+            <Link
+              to="/watchlist"
+              activeProps={{
+                className: "btn-active font-bold text-error bg-error/10",
+              }}
+              className="btn btn-ghost btn-sm h-10 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl inline-flex items-center gap-2"
+            >
+              <Heart className="w-4 h-4 text-error fill-error/20" />
+              <span className="hidden sm:inline">Saved</span>
+              {savedCount > 0 && (
+                <span className="badge badge-error badge-xs font-bold text-[10px]">
+                  {savedCount}
+                </span>
+              )}
             </Link>
           </nav>
 
@@ -133,37 +151,46 @@ export function PublicNavbar() {
                 <div
                   tabIndex={0}
                   role="button"
-                  className="btn btn-ghost btn-circle btn-sm bg-base-200"
+                  className="btn btn-ghost btn-circle btn-sm avatar placeholder"
                 >
-                  <User className="w-4 h-4" />
+                  <div className="bg-primary text-primary-content rounded-full w-8 font-bold text-xs">
+                    <User className="w-4 h-4" />
+                  </div>
                 </div>
                 <ul
                   tabIndex={0}
-                  className="dropdown-content menu menu-sm bg-base-100 rounded-2xl z-50 w-56 p-3 shadow-xl border border-base-300 mt-2 space-y-1.5"
+                  className="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-2xl w-52 border border-base-200 mt-2 z-50 text-xs font-semibold space-y-1"
                 >
                   <li>
                     <Link
-                      to={"/dashboard" as string}
-                      className="font-bold py-2.5 inline-flex items-center gap-2.5 rounded-xl"
+                      to="/dashboard"
+                      className="inline-flex items-center gap-2 py-2"
                     >
                       <LayoutDashboard className="w-4 h-4 text-primary" />
-                      <span>Dashboard</span>
+                      <span>Dashboard Overview</span>
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/stores"
-                      className="py-2.5 inline-flex items-center gap-2.5 rounded-xl"
+                      to="/watchlist"
+                      className="inline-flex items-center gap-2 py-2"
                     >
-                      <ShieldCheck className="w-4 h-4 text-accent" />
-                      <span>Verified Stores</span>
+                      <Heart className="w-4 h-4 text-error" />
+                      <span>Saved iPhones ({savedCount})</span>
                     </Link>
                   </li>
-                  <div className="divider my-1.5" />
                   <li>
+                    <Link
+                      to="/dashboard/phones"
+                      className="inline-flex items-center gap-2 py-2"
+                    >
+                      <span>My iPhone Listings</span>
+                    </Link>
+                  </li>
+                  <li className="border-t border-base-200 mt-1 pt-1">
                     <button
                       onClick={handleSignOut}
-                      className="text-error font-semibold py-2.5 inline-flex items-center gap-2.5 rounded-xl"
+                      className="text-error inline-flex items-center gap-2 py-2"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
@@ -173,8 +200,8 @@ export function PublicNavbar() {
               </div>
             ) : (
               <Link
-                to={"/app/auth/login" as string}
-                className="btn btn-ghost btn-sm h-10 px-4 text-xs sm:text-sm font-semibold rounded-xl"
+                to="/app/auth/login"
+                className="btn btn-ghost btn-sm h-10 px-4 rounded-xl font-semibold text-xs sm:text-sm"
               >
                 Sign In
               </Link>

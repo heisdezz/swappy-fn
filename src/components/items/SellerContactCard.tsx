@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowLeftRight,
   MapPin,
-  MessageCircle,
   MessageSquare,
   Phone,
   ShieldCheck,
+  Sparkles,
   Star,
   Store,
 } from "lucide-react";
@@ -16,12 +16,14 @@ interface SellerContactCardProps {
   item: ItemDetailRecord;
   onOpenSwapModal?: () => void;
   onOpenChatDrawer?: () => void;
+  onOpenReviewModal?: () => void;
 }
 
 export function SellerContactCard({
   item,
   onOpenSwapModal,
   onOpenChatDrawer,
+  onOpenReviewModal,
 }: SellerContactCardProps) {
   const [showPhone, setShowPhone] = useState(false);
 
@@ -99,7 +101,7 @@ export function SellerContactCard({
           <button
             type="button"
             onClick={onOpenSwapModal}
-            className="btn btn-secondary btn-block h-12 rounded-2xl font-black text-sm sm:text-base shadow-sm inline-flex items-center justify-center gap-2.5"
+            className="btn btn-secondary btn-block h-12 rounded-2xl font-black text-sm sm:text-base shadow-sm inline-flex items-center justify-center gap-2.5 cursor-pointer"
           >
             <ArrowLeftRight className="w-4.5 h-4.5" />
             <span>Propose Device Swap</span>
@@ -109,7 +111,7 @@ export function SellerContactCard({
         <button
           type="button"
           onClick={onOpenChatDrawer}
-          className="btn btn-primary btn-block h-12 rounded-2xl font-bold text-sm sm:text-base shadow-sm inline-flex items-center justify-center gap-2.5"
+          className="btn btn-primary btn-block h-12 rounded-2xl font-bold text-sm sm:text-base shadow-sm inline-flex items-center justify-center gap-2.5 cursor-pointer"
         >
           <MessageSquare className="w-4.5 h-4.5" />
           <span>Message Seller (In-App)</span>
@@ -120,16 +122,16 @@ export function SellerContactCard({
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleWhatsAppClick}
-          className="btn btn-outline border-base-300 btn-block h-12 rounded-2xl font-bold text-sm sm:text-base shadow-sm inline-flex items-center justify-center gap-2.5 hover:bg-success hover:text-success-content hover:border-success"
+          className="btn btn-outline border-base-300 btn-block h-12 rounded-2xl font-bold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 hover:bg-success hover:text-success-content hover:border-success transition-all"
         >
-          <MessageCircle className="w-4.5 h-4.5 text-success" />
+          <span className="w-2.5 h-2.5 rounded-full bg-success animate-pulse" />
           <span>Chat on WhatsApp</span>
         </a>
 
         <button
           type="button"
           onClick={handleRevealPhone}
-          className="btn btn-ghost border border-base-300 btn-block h-12 rounded-2xl font-bold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 hover:bg-base-200"
+          className="btn btn-ghost border border-base-300 btn-block h-12 rounded-2xl font-bold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 hover:bg-base-200 cursor-pointer"
         >
           <Phone className="w-4.5 h-4.5 text-base-content/70" />
           <span>{showPhone ? sellerPhone : `Call: ${maskedPhone}`}</span>
@@ -142,7 +144,7 @@ export function SellerContactCard({
           <div className="w-14 h-14 rounded-2xl bg-primary/20 text-primary-content font-black flex items-center justify-center text-xl shrink-0">
             {seller.name.slice(0, 1).toUpperCase()}
           </div>
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-base sm:text-lg text-base-content truncate">
                 {seller.name}
@@ -162,6 +164,23 @@ export function SellerContactCard({
           </div>
         </div>
 
+        {/* Rate Seller Prompt */}
+        {onOpenReviewModal && (
+          <button
+            type="button"
+            onClick={onOpenReviewModal}
+            className="w-full py-2 px-3 rounded-xl bg-base-200/60 hover:bg-base-200 border border-base-300/60 text-xs font-bold text-base-content/80 flex items-center justify-between transition-colors cursor-pointer"
+          >
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              <span>Concluded a deal? Rate this dealer</span>
+            </span>
+            <span className="text-primary text-[11px] font-black">
+              Write Review &rarr;
+            </span>
+          </button>
+        )}
+
         {/* Store badge if associated with merchant store */}
         {item.store && (
           <div className="p-3 rounded-2xl bg-base-200/50 border border-base-300 flex items-center justify-between">
@@ -178,7 +197,7 @@ export function SellerContactCard({
             </div>
             <Link
               to="/store/$slug"
-              params={{ slug: item.store.slug }}
+              params={{ slug: item.store.slug || item.store.id }}
               className="text-xs font-bold text-primary hover:underline"
             >
               Visit Store

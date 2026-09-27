@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeftRight, MapPin, Smartphone } from "lucide-react";
 import { BatteryBadge } from "./BatteryBadge";
 import { ConditionBadge } from "./ConditionBadge";
+import { WatchlistButton } from "./WatchlistButton";
 import { getItemCardImageUrl } from "../../helpers/images";
 import { createItemSlug } from "../../utils/slug";
 
@@ -10,6 +11,8 @@ export interface ItemCardRecord {
   collectionId?: string;
   collectionName?: string;
   title?: string;
+  model?: string;
+  seller?: any;
   price?: number;
   storage?: string;
   color?: string;
@@ -51,7 +54,7 @@ export function ItemCard({ item, className = "" }: ItemCardProps) {
 
   return (
     <div
-      className={`card bg-base-100 border border-base-300 shadow-xs hover:shadow-md transition-shadow overflow-hidden group rounded-3xl ${className}`}
+      className={`card bg-base-100 border border-base-300 shadow-xs hover:shadow-md transition-shadow overflow-hidden group rounded-3xl relative ${className}`}
     >
       <Link to={itemDetailUrl as string} className="block overflow-hidden">
         <figure className="relative aspect-4/3 bg-base-200 overflow-hidden">
@@ -78,12 +81,14 @@ export function ItemCard({ item, className = "" }: ItemCardProps) {
             </div>
           )}
 
+          {/* Promoted badge */}
           {item.is_promoted && (
             <span className="badge badge-primary text-primary-content badge-md font-bold absolute top-3 left-3 shadow-sm text-xs">
               Featured
             </span>
           )}
 
+          {/* Swap indicator */}
           {item.accepts_swap && (
             <span
               className="badge badge-secondary text-secondary-content badge-md font-bold absolute top-3 right-3 shadow-sm inline-flex items-center gap-1.5 text-xs"
@@ -93,6 +98,11 @@ export function ItemCard({ item, className = "" }: ItemCardProps) {
               <span>Swap</span>
             </span>
           )}
+
+          {/* Watchlist Bookmark Button */}
+          <div className="absolute bottom-3 right-3 z-10">
+            <WatchlistButton item={item} size="sm" />
+          </div>
         </figure>
       </Link>
 

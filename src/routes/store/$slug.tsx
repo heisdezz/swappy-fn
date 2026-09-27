@@ -1,10 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Building2, ChevronRight, Smartphone } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  ChevronRight,
+  Smartphone,
+  Star,
+} from "lucide-react";
 import { ItemGrid } from "../../components/items/ItemGrid";
 import { Footer } from "../../components/layout/Footer";
 import { PublicNavbar } from "../../components/layout/PublicNavbar";
+import { ReviewList } from "../../components/reviews/ReviewList";
 import { SafetyAlert } from "../../components/common/SafetyAlert";
 import { StoreBanner } from "../../components/store/StoreBanner";
+import { useSellerReviews } from "../../helpers/reviews";
 import { getStoreBySlugFn } from "../../server/listings";
 
 export const Route = createFileRoute("/store/$slug")({
@@ -15,6 +23,13 @@ export const Route = createFileRoute("/store/$slug")({
 
 function StorefrontPage() {
   const { store, inventory } = Route.useLoaderData();
+  const sellerId =
+    store?.user || (inventory[0]?.seller as any) || store?.id || "";
+  const {
+    reviews,
+    summary,
+    isLoading: isReviewsLoading,
+  } = useSellerReviews(sellerId);
 
   if (!store) {
     return (
@@ -111,6 +126,33 @@ function StorefrontPage() {
             )}
           </div>
         </div>
+
+        {/* Seller Reputation & Buyer Reviews */}
+        <section className="pt-4 border-t border-base-200 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-base-content tracking-tight flex items-center gap-2">
+                <span>Dealer Reputation & Reviews</span>
+                <span className="badge badge-warning font-bold inline-flex items-center gap-1 text-xs">
+                  <Star className="w-3 h-3 fill-current" />
+                  <span>{summary.average.toFixed(1)}</span>
+                </span>
+              </h2>
+              <p className="text-xs text-base-content/60 mt-0.5">
+                Verified buyer ratings and authentic in-person inspection
+                reviews
+              </p>
+            </div>
+          </div>
+
+          <ReviewList
+            sellerId={sellerId}
+            sellerName={store.name}
+            reviews={reviews}
+            summary={summary}
+            isLoading={isReviewsLoading}
+          />
+        </section>
 
         {/* Safety Alert */}
         <SafetyAlert />

@@ -13,9 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as StoresRouteImport } from './routes/stores'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as AppAuthRouteRouteImport } from './routes/app/auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard/messages'
+import { Route as DashboardSavedRouteImport } from './routes/dashboard/saved'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStoresRouteImport } from './routes/dashboard/stores'
 import { Route as ItemsSlugRouteImport } from './routes/items/$slug'
@@ -48,6 +50,11 @@ const StoresRoute = StoresRouteImport.update({
   path: '/stores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppAuthRouteRoute = AppAuthRouteRouteImport.update({
   id: '/app/auth',
   path: '/app/auth',
@@ -61,6 +68,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardMessagesRoute = DashboardMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardSavedRoute = DashboardSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
@@ -124,8 +136,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
+  '/watchlist': typeof WatchlistRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/saved': typeof DashboardSavedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -143,8 +157,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
+  '/watchlist': typeof WatchlistRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/saved': typeof DashboardSavedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -164,8 +180,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
+  '/watchlist': typeof WatchlistRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
   '/dashboard/messages': typeof DashboardMessagesRoute
+  '/dashboard/saved': typeof DashboardSavedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -186,8 +204,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/stores'
+    | '/watchlist'
     | '/app/auth'
     | '/dashboard/messages'
+    | '/dashboard/saved'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -205,8 +225,10 @@ export interface FileRouteTypes {
     | '/'
     | '/explore'
     | '/stores'
+    | '/watchlist'
     | '/app/auth'
     | '/dashboard/messages'
+    | '/dashboard/saved'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -225,8 +247,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/explore'
     | '/stores'
+    | '/watchlist'
     | '/app/auth'
     | '/dashboard/messages'
+    | '/dashboard/saved'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -246,6 +270,7 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   ExploreRoute: typeof ExploreRoute
   StoresRoute: typeof StoresRoute
+  WatchlistRoute: typeof WatchlistRoute
   AppAuthRouteRoute: typeof AppAuthRouteRouteWithChildren
   ItemsSlugRoute: typeof ItemsSlugRoute
   PaymentCallbackRoute: typeof PaymentCallbackRoute
@@ -283,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/auth': {
       id: '/app/auth'
       path: '/app/auth'
@@ -302,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/dashboard/messages'
       preLoaderRoute: typeof DashboardMessagesRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/saved': {
+      id: '/dashboard/saved'
+      path: '/saved'
+      fullPath: '/dashboard/saved'
+      preLoaderRoute: typeof DashboardSavedRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/settings': {
@@ -386,6 +425,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteRouteChildren {
   DashboardMessagesRoute: typeof DashboardMessagesRoute
+  DashboardSavedRoute: typeof DashboardSavedRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardStoresRoute: typeof DashboardStoresRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -396,6 +436,7 @@ interface DashboardRouteRouteChildren {
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardMessagesRoute: DashboardMessagesRoute,
+  DashboardSavedRoute: DashboardSavedRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardStoresRoute: DashboardStoresRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -427,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   ExploreRoute: ExploreRoute,
   StoresRoute: StoresRoute,
+  WatchlistRoute: WatchlistRoute,
   AppAuthRouteRoute: AppAuthRouteRouteWithChildren,
   ItemsSlugRoute: ItemsSlugRoute,
   PaymentCallbackRoute: PaymentCallbackRoute,

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  Star,
 } from "lucide-react";
 import { getItemBySlugFn } from "../../server/listings";
 import { PublicNavbar } from "../../components/layout/PublicNavbar";
@@ -22,7 +23,11 @@ import { ItemChatDrawer } from "../../components/items/ItemChatDrawer";
 import { ItemGrid } from "../../components/items/ItemGrid";
 import { BatteryBadge } from "../../components/items/BatteryBadge";
 import { ConditionBadge } from "../../components/items/ConditionBadge";
+import { WatchlistButton } from "../../components/items/WatchlistButton";
+import { ReviewList } from "../../components/reviews/ReviewList";
+import { ReviewModal } from "../../components/reviews/ReviewModal";
 import { SafetyAlert } from "../../components/common/SafetyAlert";
+import { useSellerReviews } from "../../helpers/reviews";
 
 export const Route = createFileRoute("/items/$slug")({
   loader: async ({ params }) =>
@@ -34,6 +39,14 @@ function ItemDetailPage() {
   const { item, relatedItems } = Route.useLoaderData();
   const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
   const [isChatDrawerOpen, setIsChatDrawerOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const sellerId = item?.seller?.id || "";
+  const {
+    reviews,
+    summary,
+    isLoading: isReviewsLoading,
+  } = useSellerReviews(sellerId);
 
   // Trigger non-blocking visit analytics on mount
   useEffect(() => {
@@ -101,8 +114,8 @@ function ItemDetailPage() {
           </span>
         </nav>
 
-        {/* Back Button */}
-        <div>
+        {/* Back Button & Header Actions */}
+        <div className="flex items-center justify-between gap-4">
           <Link
             to="/explore"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-base-content/70 hover:text-primary transition-colors"
@@ -110,6 +123,11 @@ function ItemDetailPage() {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Catalog</span>
           </Link>
+
+          {/* Bookmark & Watchlist Button */}
+          <div className="flex items-center gap-2">
+            <WatchlistButton item={item as any} size="lg" showLabel />
+          </div>
         </div>
 
         {/* Main 2-Column Product Grid */}
@@ -128,17 +146,17 @@ function ItemDetailPage() {
 
             {/* Title & Badges */}
             <div className="space-y-3 pt-2">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {item.storage && (
-                  <span className="badge badge-neutral font-bold text-xs">
+                  <span className="badge badge-neutral badge-md font-bold text-xs">
                     {item.storage}
                   </span>
                 )}
                 <BatteryBadge percentage={item.battery_health} />
                 <ConditionBadge condition={item.condition} />
-                {item.carrier_status === "factory_unlocked" && (
-                  <span className="badge badge-outline badge-success text-xs font-semibold">
-                    Factory Unlocked
+                {item.carrier_status && (
+                  <span className="badge badge-outline badge-md font-semibold text-xs capitalize">
+                    {item.carrier_status.replace(/_/g, " ")}
                   </span>
                 )}
               </div>
@@ -228,15 +246,47 @@ function ItemDetailPage() {
               item={item}
               onOpenSwapModal={() => setIsSwapModalOpen(true)}
               onOpenChatDrawer={() => setIsChatDrawerOpen(true)}
+              onOpenReviewModal={() => setIsReviewModalOpen(true)}
             />
 
             <SafetyAlert />
           </div>
         </div>
 
+        {/* Seller Reputation & Reviews Section */}
+        {sellerId && (
+          <section className="pt-8 border-t border-base-200 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-black text-base-content tracking-tight flex items-center gap-2">
+                  <span>Seller Reputation & Trade Reviews</span>
+                  <span className="badge badge-warning font-bold inline-flex items-center gap-1 text-xs">
+                    <Star className="w-3 h-3 fill-current" />
+                    <span>{summary.average.toFixed(1)}</span>
+                  </span>
+                </h2>
+                <p className="text-xs text-base-content/60 mt-0.5">
+                  Verified buyer feedback for{" "}
+                  {item.seller?.name || "this dealer"}
+                </p>
+              </div>
+            </div>
+
+            <ReviewList
+              sellerId={sellerId}
+              sellerName={item.seller?.name || "Seller"}
+              itemId={item.id}
+              itemTitle={item.title}
+              reviews={reviews}
+              summary={summary}
+              isLoading={isReviewsLoading}
+            />
+          </section>
+        )}
+
         {/* Similar Verified Deals Section */}
         {relatedItems && relatedItems.length > 0 && (
-          <div className="pt-10 border-t border-base-200 space-y-6">
+          <div className="pt-8 border-t border-base-200 space-y-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="p-1.5 rounded-lg bg-primary text-primary-content">
@@ -280,6 +330,18 @@ function ItemDetailPage() {
         sellerName={item.seller?.name || "Seller"}
         sellerId={item.seller?.id}
       />
+
+      {/* Write a Review Modal */}
+      {sellerId && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          sellerId={sellerId}
+          sellerName={item.seller?.name || "Seller"}
+          itemId={item.id}
+          itemTitle={item.title}
+        />
+      )}
     </div>
   );
 }

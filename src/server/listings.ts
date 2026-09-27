@@ -42,6 +42,7 @@ export interface ItemDetailRecord extends ItemCardRecord {
 
 export interface StoreDetailRecord {
   id: string;
+  user?: string;
   name: string;
   slug: string;
   description?: string;
@@ -146,7 +147,11 @@ function sanitizeDetailRecord(item: Record<string, unknown>): ItemDetailRecord {
     views: typeof item.views === "number" ? item.views : 142,
     category: item.category ? String(item.category) : undefined,
     seller: {
-      id: seller?.id ? String(seller.id) : (item.seller ? String(item.seller) : ""),
+      id: seller?.id
+        ? String(seller.id)
+        : item.seller
+          ? String(item.seller)
+          : "",
       name: sellerName,
       username: seller?.username ? String(seller.username) : undefined,
       phone: sellerPhone,
@@ -349,7 +354,7 @@ export const getStoresFn = createServerFn({ method: "GET" }).handler(
       });
 
       const storesWithItems: StoreDetailRecord[] = await Promise.all(
-        (storeRes.items || []).map(async (st) => {
+        (storeRes.items || []).map(async (st: Record<string, any>) => {
           const storeId = String(st.id);
           let itemCount = 0;
           let featured: ItemCardRecord[] = [];
@@ -370,6 +375,7 @@ export const getStoresFn = createServerFn({ method: "GET" }).handler(
 
           return {
             id: String(st.id),
+            user: st.user ? String(st.user) : undefined,
             name: String(st.name || "Verified Store"),
             slug: String(st.slug || st.id),
             description: st.description ? String(st.description) : undefined,
@@ -437,6 +443,7 @@ export const getStoreBySlugFn = createServerFn({ method: "GET" })
           return {
             store: {
               id: storeId,
+              user: storeRecord.user ? String(storeRecord.user) : undefined,
               name: String(storeRecord.name || "Verified Store"),
               slug: String(storeRecord.slug || storeId),
               description: storeRecord.description
