@@ -19,6 +19,7 @@ import { Route as DashboardMessagesRouteImport } from './routes/dashboard/messag
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStoresRouteImport } from './routes/dashboard/stores'
 import { Route as ItemsSlugRouteImport } from './routes/items/$slug'
+import { Route as PaymentCallbackRouteImport } from './routes/payment/callback'
 import { Route as StoreSlugRouteImport } from './routes/store/$slug'
 import { Route as AppStoreIndexRouteImport } from './routes/app/store/index'
 import { Route as DashboardPhonesIndexRouteImport } from './routes/dashboard/phones/index'
@@ -77,6 +78,11 @@ const ItemsSlugRoute = ItemsSlugRouteImport.update({
   path: '/items/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
+  id: '/payment/callback',
+  path: '/payment/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoreSlugRoute = StoreSlugRouteImport.update({
   id: '/store/$slug',
   path: '/store/$slug',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
+  '/payment/callback': typeof PaymentCallbackRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
+  '/payment/callback': typeof PaymentCallbackRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
+  '/payment/callback': typeof PaymentCallbackRoute
   '/store/$slug': typeof StoreSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/phones/$id': typeof DashboardPhonesIdRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
+    | '/payment/callback'
     | '/store/$slug'
     | '/dashboard/'
     | '/dashboard/phones/$id'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
+    | '/payment/callback'
     | '/store/$slug'
     | '/dashboard'
     | '/dashboard/phones/$id'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
+    | '/payment/callback'
     | '/store/$slug'
     | '/dashboard/'
     | '/dashboard/phones/$id'
@@ -236,6 +248,7 @@ export interface RootRouteChildren {
   StoresRoute: typeof StoresRoute
   AppAuthRouteRoute: typeof AppAuthRouteRouteWithChildren
   ItemsSlugRoute: typeof ItemsSlugRoute
+  PaymentCallbackRoute: typeof PaymentCallbackRoute
   StoreSlugRoute: typeof StoreSlugRoute
   AppStoreIndexRoute: typeof AppStoreIndexRoute
 }
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/items/$slug'
       fullPath: '/items/$slug'
       preLoaderRoute: typeof ItemsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/callback': {
+      id: '/payment/callback'
+      path: '/payment/callback'
+      fullPath: '/payment/callback'
+      preLoaderRoute: typeof PaymentCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/store/$slug': {
@@ -409,6 +429,7 @@ const rootRouteChildren: RootRouteChildren = {
   StoresRoute: StoresRoute,
   AppAuthRouteRoute: AppAuthRouteRouteWithChildren,
   ItemsSlugRoute: ItemsSlugRoute,
+  PaymentCallbackRoute: PaymentCallbackRoute,
   StoreSlugRoute: StoreSlugRoute,
   AppStoreIndexRoute: AppStoreIndexRoute,
 }

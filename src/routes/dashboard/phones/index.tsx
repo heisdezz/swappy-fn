@@ -7,12 +7,14 @@ import {
   Pencil,
   Plus,
   Smartphone,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { pb } from "../../../client/pb";
 import { DashboardLayout } from "../../../components/dashboard/DashboardLayout";
 import type { ItemCardRecord } from "../../../components/items/ItemCard";
+import { PaymentModal } from "../../../components/payments/PaymentModal";
 import SearchBar from "../../../components/SearchBar";
 import PageLoader from "../../../components/wrappers/PageLoader";
 import { extract_message } from "../../../helpers/api";
@@ -188,6 +190,11 @@ function MyPhonesList({
   setActiveFilter,
   onDelete,
 }: MyPhonesListProps) {
+  const [promotingItem, setPromotingItem] = useState<ItemCardRecord | null>(
+    null,
+  );
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
+
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
       const q = searchQuery.toLowerCase().trim();
@@ -348,7 +355,20 @@ function MyPhonesList({
                 </div>
 
                 {/* Quick Row Actions */}
-                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                <div className="flex items-center gap-2 self-end sm:self-auto shrink-0 flex-wrap">
+                  {/* Spotlight / Promote Button */}
+                  <button
+                    onClick={() => {
+                      setPromotingItem(item);
+                      setIsPromoteModalOpen(true);
+                    }}
+                    className="btn btn-warning/15 text-warning-content hover:bg-warning hover:text-black btn-sm rounded-xl font-extrabold inline-flex items-center gap-1.5 text-xs transition-colors cursor-pointer"
+                    title="Spotlight iPhone listing"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-warning" />
+                    <span>Boost</span>
+                  </button>
+
                   <Link
                     to={"/items/$slug" as string}
                     params={{ slug: itemSlug }}
@@ -402,6 +422,17 @@ function MyPhonesList({
           </Link>
         </div>
       )}
+
+      {/* Paystack Promotion Modal */}
+      <PaymentModal
+        isOpen={isPromoteModalOpen}
+        onClose={() => {
+          setIsPromoteModalOpen(false);
+          setPromotingItem(null);
+        }}
+        type="promotion"
+        item={promotingItem}
+      />
     </div>
   );
 }

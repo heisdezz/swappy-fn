@@ -20,6 +20,7 @@ import { pb } from "../../client/pb";
 import { DashboardLayout } from "../../components/dashboard/DashboardLayout";
 import SimpleInput from "../../components/inputs/SimpleInput";
 import SimpleTextArea from "../../components/inputs/SimpleTextArea";
+import { PaymentModal } from "../../components/payments/PaymentModal";
 import PageLoader from "../../components/wrappers/PageLoader";
 import { extract_message } from "../../helpers/api";
 
@@ -76,6 +77,7 @@ function StoreManagementView({ store }: { store: Record<string, any> }) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const methods = useForm<StoreFormValues>({
     defaultValues: {
@@ -456,13 +458,21 @@ function StoreManagementView({ store }: { store: Record<string, any> }) {
             </p>
             <button
               type="button"
-              className="btn btn-outline btn-primary btn-sm rounded-xl w-full text-xs font-bold"
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="btn btn-outline btn-primary btn-sm rounded-xl w-full text-xs font-bold cursor-pointer"
             >
               Explore Store Promotions
             </button>
           </div>
         </div>
       </div>
+
+      {/* Paystack Subscription Payment Modal */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        type="subscription"
+      />
     </div>
   );
 }
