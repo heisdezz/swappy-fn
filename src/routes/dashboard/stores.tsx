@@ -69,11 +69,11 @@ function DashboardStoresPage() {
   );
 }
 
-function StoreManagementView({ store }: { store: any }) {
+function StoreManagementView({ store }: { store: Record<string, any> }) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
@@ -82,8 +82,8 @@ function StoreManagementView({ store }: { store: any }) {
       name: store.name || "",
       slug: store.slug || "",
       address: store.address || "",
-      city: store.city || "Ikeja",
-      state: store.state || "Lagos",
+      city: store.city || "",
+      state: store.state || "",
       phone: store.phone || "",
       whatsapp: store.whatsapp || "",
       description: store.description || "",
@@ -95,23 +95,19 @@ function StoreManagementView({ store }: { store: any }) {
   const currentLogoUrl = logoFile
     ? URL.createObjectURL(logoFile)
     : store.logo
-      ? store.logo.startsWith("http") || store.logo.startsWith("/")
-        ? store.logo
-        : pb.files.getURL(store, store.logo)
+      ? pb.files.getURL(store, store.logo)
       : null;
 
   const currentBannerUrl = bannerFile
     ? URL.createObjectURL(bannerFile)
     : store.banner
-      ? store.banner.startsWith("http") || store.banner.startsWith("/")
-        ? store.banner
-        : pb.files.getURL(store, store.banner)
+      ? pb.files.getURL(store, store.banner)
       : null;
 
   const onSubmit = async (data: StoreFormValues) => {
     setIsSubmitting(true);
-    setErrorMessage("");
     setSaveSuccess(false);
+    setErrorMessage(null);
 
     try {
       const formData = new FormData();
@@ -132,10 +128,9 @@ function StoreManagementView({ store }: { store: any }) {
       }
 
       await pb.collection("store").update(store.id, formData);
-      queryClient.invalidateQueries({ queryKey: ["my-store"] });
-
       setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 4000);
+      queryClient.invalidateQueries({ queryKey: ["my-store"] });
+      queryClient.invalidateQueries({ queryKey: ["stores-nav"] });
     } catch (err) {
       console.error("Error updating store:", err);
       setErrorMessage(extract_message(err));
@@ -145,7 +140,7 @@ function StoreManagementView({ store }: { store: any }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -165,7 +160,8 @@ function StoreManagementView({ store }: { store: any }) {
             )}
           </div>
           <p className="text-xs sm:text-sm text-base-content/70 mt-1">
-            Manage your physical shop profile, location credentials, and public storefront.
+            Manage your physical shop profile, location credentials, and public
+            storefront.
           </p>
         </div>
 
@@ -214,7 +210,7 @@ function StoreManagementView({ store }: { store: any }) {
       )}
 
       {/* Store Banner & Brand Identity Preview */}
-      <div className="bg-base-100 rounded-3xl border border-base-300 overflow-hidden shadow-xs">
+      <div className="bg-base-100 rounded-3xl border border-base-300 overflow-hidden shadow-xs w-full">
         {/* Banner Area */}
         <div className="h-44 sm:h-52 bg-base-200 relative overflow-hidden flex items-center justify-center">
           {currentBannerUrl ? (
@@ -225,7 +221,7 @@ function StoreManagementView({ store }: { store: any }) {
             />
           ) : (
             <div className="flex flex-col items-center justify-center text-base-content/40 space-y-1">
-              <Building2 className="w-10 h-10 stroke-[1.5]" />
+              <Building2 className="w-10 h-10 stroke-[1.5] border-0" />
               <span className="text-xs font-bold">No custom banner set</span>
             </div>
           )}
@@ -315,10 +311,10 @@ function StoreManagementView({ store }: { store: any }) {
       </div>
 
       {/* Main Grid: Settings & Trust Verification */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
         {/* Left Column: Form Details (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-5 shadow-xs">
+          <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-5 shadow-xs w-full">
             <div className="border-b border-base-200 pb-3">
               <h3 className="font-extrabold text-base text-base-content">
                 Storefront Information
@@ -338,20 +334,26 @@ function StoreManagementView({ store }: { store: any }) {
                   <SimpleInput
                     label="Store Name"
                     placeholder="e.g. Swappy Prime Gadgets"
-                    {...register("name", { required: "Store name is required" })}
+                    {...register("name", {
+                      required: "Store name is required",
+                    })}
                   />
 
                   <SimpleInput
                     label="Storefront URL Slug"
                     placeholder="e.g. swappy-prime"
-                    {...register("slug", { required: "Slug is required" })}
+                    {...register("slug", {
+                      required: "Store slug is required",
+                    })}
                   />
                 </div>
 
                 <SimpleInput
-                  label="Physical Address / Plaza Unit"
-                  placeholder="e.g. Shop 14, Digital Square, Pepple Street, Computer Village"
-                  {...register("address", { required: "Address is required" })}
+                  label="Physical Shop Address"
+                  placeholder="e.g. Shop 12, Digital Square, Pepple Street, Computer Village"
+                  {...register("address", {
+                    required: "Physical address is required",
+                  })}
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -376,16 +378,16 @@ function StoreManagementView({ store }: { store: any }) {
                   />
 
                   <SimpleInput
-                    label="WhatsApp Number (with country code)"
+                    label="WhatsApp Business Number"
                     placeholder="e.g. 2348021234567"
                     {...register("whatsapp")}
                   />
                 </div>
 
                 <SimpleTextArea
-                  label="Store Bio & Trade Policy"
+                  label="Store Description & Trade Policy"
                   rows={4}
-                  placeholder="Tell buyers about your shop, warranty policy, trade-in process, and operating hours..."
+                  placeholder="Tell buyers about your shop, available stock, physical testing policy, and warranties..."
                   {...register("description")}
                 />
               </form>
@@ -393,50 +395,71 @@ function StoreManagementView({ store }: { store: any }) {
           </div>
         </div>
 
-        {/* Right Column: Physical Location & Verification Protocol (1 col) */}
+        {/* Right Column: Verification & Trust Status */}
         <div className="space-y-6">
+          {/* Verification Status Card */}
           <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-primary" />
-              <h3 className="font-extrabold text-sm text-base-content">
-                Physical Shop Verification
+              <h3 className="font-extrabold text-base text-base-content">
+                Dealer Verification
               </h3>
             </div>
 
             <p className="text-xs text-base-content/70 leading-relaxed">
-              Swappy requires physical shop verification for all registered dealers. This eliminates scams and provides buyers peace of mind for in-person device inspections.
+              Verified merchants enjoy higher placement in search results, a
+              verified dealer badge, and customer trust.
             </p>
 
-            <div className="space-y-2 pt-2 border-t border-base-200">
-              <div className="flex items-center gap-2 text-xs">
-                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                <span className="font-semibold text-base-content">
-                  Physical Hub Verification
+            <div className="p-3.5 rounded-2xl bg-base-200/60 border border-base-300/60 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-base-content/70">
+                  Shop Address
+                </span>
+                <span className="badge badge-success badge-xs font-bold">
+                  Verified
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                <span className="font-semibold text-base-content">
-                  Direct WhatsApp Leads Enabled
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-base-content/70">
+                  Contact Number
+                </span>
+                <span className="badge badge-success badge-xs font-bold">
+                  Verified
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                <span className="font-semibold text-base-content">
-                  Verified Dealer Badge on Listings
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-base-content/70">
+                  Government ID
+                </span>
+                <span className="badge badge-neutral badge-xs font-bold">
+                  Submitted
                 </span>
               </div>
+            </div>
+
+            <div className="text-[11px] text-base-content/50 leading-relaxed">
+              Need assistance updating business credentials? Contact Swappy
+              merchant support.
             </div>
           </div>
 
-          <div className="bg-accent/10 rounded-3xl border border-accent/20 p-5 space-y-2">
-            <div className="flex items-center gap-2 font-bold text-xs text-accent-content">
-              <Sparkles className="w-4 h-4 text-accent" />
-              <span>Dealer Perks</span>
+          {/* Storefront Promotion Card */}
+          <div className="bg-linear-to-br from-primary/10 via-base-100 to-secondary/10 rounded-3xl border border-primary/20 p-6 space-y-3 shadow-xs">
+            <div className="flex items-center gap-2 text-primary font-black text-sm">
+              <Sparkles className="w-4 h-4" />
+              <span>Boost Store Visibility</span>
             </div>
-            <p className="text-[11px] text-base-content/75 leading-relaxed">
-              Verified merchants with shops in Computer Village Ikeja and Banex Plaza Abuja receive prioritized search positioning and swap request routing.
+            <p className="text-xs text-base-content/70 leading-relaxed">
+              Feature your store prominently on the homepage and at the top of
+              category searches to drive 5x more buyer leads.
             </p>
+            <button
+              type="button"
+              className="btn btn-outline btn-primary btn-sm rounded-xl w-full text-xs font-bold"
+            >
+              Explore Store Promotions
+            </button>
           </div>
         </div>
       </div>
@@ -447,15 +470,15 @@ function StoreManagementView({ store }: { store: any }) {
 function CreateStoreOnboardingView() {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const methods = useForm<StoreFormValues>({
     defaultValues: {
       name: "",
       slug: "",
       address: "",
-      city: "Ikeja",
-      state: "Lagos",
+      city: "",
+      state: "",
       phone: "",
       whatsapp: "",
       description: "",
@@ -465,21 +488,21 @@ function CreateStoreOnboardingView() {
   const { register, handleSubmit, setValue, watch } = methods;
   const storeName = watch("name");
 
-  // Auto slugify store name
+  // Auto-generate slug from name if not manually modified
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nameVal = e.target.value;
     setValue("name", nameVal);
     const generatedSlug = nameVal
       .toLowerCase()
       .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-");
     setValue("slug", generatedSlug);
   };
 
   const onSubmit = async (data: StoreFormValues) => {
     setIsSubmitting(true);
-    setErrorMessage("");
+    setErrorMessage(null);
 
     try {
       const userId = pb.authStore.record?.id;
@@ -501,6 +524,7 @@ function CreateStoreOnboardingView() {
       });
 
       queryClient.invalidateQueries({ queryKey: ["my-store"] });
+      queryClient.invalidateQueries({ queryKey: ["stores-nav"] });
     } catch (err) {
       console.error("Error creating store:", err);
       setErrorMessage(extract_message(err));
@@ -510,7 +534,7 @@ function CreateStoreOnboardingView() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="w-full space-y-8">
       {/* Onboarding Welcome Banner */}
       <div className="text-center space-y-3">
         <div className="w-16 h-16 rounded-3xl bg-primary/20 text-primary flex items-center justify-center mx-auto shadow-sm">
@@ -519,8 +543,10 @@ function CreateStoreOnboardingView() {
         <h1 className="text-2xl sm:text-3xl font-black text-base-content tracking-tight">
           Create Your Verified Storefront
         </h1>
-        <p className="text-xs sm:text-sm text-base-content/70 max-w-lg mx-auto">
-          Establish your physical phone dealership on Swappy. Receive verified dealer status, direct WhatsApp buyer connections, and physical trade-in protection.
+        <p className="text-xs sm:text-sm text-base-content/70">
+          Establish your physical phone dealership on Swappy. Receive verified
+          dealer status, direct WhatsApp buyer connections, and physical
+          trade-in protection.
         </p>
       </div>
 
@@ -558,7 +584,7 @@ function CreateStoreOnboardingView() {
       </div>
 
       {/* Registration Form Card */}
-      <div className="bg-base-100 rounded-3xl border border-base-300 p-6 sm:p-8 space-y-6 shadow-xs">
+      <div className="bg-base-100 rounded-3xl border border-base-300 p-6 sm:p-8 space-y-6 shadow-xs w-full">
         <div className="border-b border-base-200 pb-3">
           <h2 className="font-extrabold text-base text-base-content">
             Store Registration Form
