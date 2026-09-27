@@ -1,8 +1,10 @@
 import {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useRef,
   type PropsWithChildren,
+  type ReactNode,
 } from "react";
 import { Toaster } from "sonner";
 import { X } from "lucide-react";
@@ -10,7 +12,10 @@ import { X } from "lucide-react";
 interface ModalProps extends PropsWithChildren {
   actions?: any;
   actionName?: string;
-  title?: string;
+  title?: ReactNode;
+  isOpen?: boolean;
+  onClose?: () => void;
+  boxClassName?: string;
 }
 
 export interface ModalHandle {
@@ -19,7 +24,18 @@ export interface ModalHandle {
 }
 
 const Modal = forwardRef<ModalHandle, ModalProps>(
-  ({ children, actions, actionName: _actionName, title }, ref) => {
+  (
+    {
+      children,
+      actions,
+      actionName: _actionName,
+      title,
+      isOpen,
+      onClose,
+      boxClassName = "max-w-2xl",
+    },
+    ref,
+  ) => {
     const modalRef = useRef<HTMLDialogElement>(null);
 
     useImperativeHandle(ref, () => ({
@@ -31,27 +47,57 @@ const Modal = forwardRef<ModalHandle, ModalProps>(
       },
     }));
 
+    useEffect(() => {
+      if (isOpen === undefined) return;
+      const dialog = modalRef.current;
+      if (!dialog) return;
+
+      if (isOpen && !dialog.open) {
+        dialog.showModal();
+      } else if (!isOpen && dialog.open) {
+        dialog.close();
+      }
+    }, [isOpen]);
+
+    const handleClose = () => {
+      modalRef.current?.close();
+      onClose?.();
+    };
+
     return (
-      <dialog ref={modalRef} className="modal modal-middle sm:modal-middle">
+      <dialog
+        ref={modalRef}
+        className="modal modal-middle sm:modal-middle"
+        onClose={onClose}
+      >
         <Toaster theme="dark" richColors closeButton />
-        <div className="modal-box max-w-2xl flex flex-col max-h-[90vh] p-6 rounded-lg shadow-xl relative">
-          <div className="flex">
-            {title && <h3 className="font-bold text-lg ">{title}</h3>}
+        <div
+          className={`modal-box flex flex-col max-h-[90vh] p-6 rounded-3xl shadow-2xl relative bg-base-100 text-base-content border border-base-300 ${boxClassName}`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            {title &&
+              (typeof title === "string" ? (
+                <h3 className="font-extrabold text-lg text-base-content">
+                  {title}
+                </h3>
+              ) : (
+                <div className="flex-1">{title}</div>
+              ))}
             <form method="dialog" className="ml-auto">
               <button
                 type="button"
-                className="btn btn-sm btn-circle btn-ghost text-gray-500 hover:text-gray-700"
-                onClick={() => modalRef.current?.close()}
+                className="btn btn-sm btn-circle btn-ghost text-base-content/60 hover:text-base-content cursor-pointer"
+                onClick={handleClose}
               >
                 <X size={20} />
               </button>
             </form>
           </div>
-          {children && <div className="my-3">{children}</div>}
-          {actions && <div className="ml-auto">{actions}</div>}
+          {children && <div className="my-3 overflow-y-auto">{children}</div>}
+          {actions && <div className="ml-auto pt-2">{actions}</div>}
         </div>
         <form method="dialog" className="modal-backdrop">
-          <button type="button" onClick={() => modalRef.current?.close()}>
+          <button type="button" onClick={handleClose}>
             close
           </button>
         </form>
@@ -63,3 +109,4 @@ const Modal = forwardRef<ModalHandle, ModalProps>(
 Modal.displayName = "Modal";
 
 export default Modal;
+export { Modal };

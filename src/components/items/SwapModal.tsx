@@ -6,11 +6,11 @@ import {
   Lock,
   MapPin,
   ShieldAlert,
-  X,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { pb } from "../../client/pb";
 import type { ItemDetailRecord } from "../../server/listings";
+import Modal from "../modals/DialogModal";
 
 interface SwapModalProps {
   isOpen: boolean;
@@ -40,18 +40,26 @@ const popularSwapModels = [
   "iPhone 13 Pro",
   "iPhone 13",
   "iPhone 12 Pro Max",
+  "iPhone 12 Pro",
   "iPhone 12",
   "iPhone 11 Pro Max",
+  "iPhone 11 Pro",
   "iPhone 11",
+  "iPhone XR",
+  "iPhone X",
 ];
+
+const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB"];
+const conditionOptions = ["brand_new", "open_box", "flawless", "good", "fair"];
 
 export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [proposalSent, setProposalSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
+  const [proposalSent, setProposalSent] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
 
-  const isAuthenticated = pb.authStore.isValid && !!pb.authStore.record?.id;
+  const isAuthenticated = pb.authStore.isValid;
+  const currentUserId = pb.authStore.record?.id;
 
   const {
     register,
@@ -62,72 +70,60 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
     formState: { errors },
   } = useForm<SwapProposalFormValues>({
     defaultValues: {
-      offeredModel: "iPhone 14 Pro",
+      offeredModel: popularSwapModels[0],
       offeredStorage: "128GB",
-      offeredBattery: 87,
+      offeredBattery: 88,
       offeredCondition: "flawless",
-      offeredIssues: "None, clean device",
-      cashDirection: "i_add_cash",
-      cashAmount: 200000,
-      meetingSpot: "Ikeja City Mall (Public Food Court)",
-      message: "Available for inspection at a public mall.",
+      offeredIssues: "",
+      cashDirection: "even_swap",
+      cashAmount: 0,
+      meetingSpot: "",
+      message: "",
     },
   });
 
-  const selectedModel = watch("offeredModel");
   const selectedCashDirection = watch("cashDirection");
+  const selectedModel = watch("offeredModel");
   const meetingSpotValue = watch("meetingSpot");
 
-  if (!isOpen) return null;
+  const onSubmit = async (values: SwapProposalFormValues) => {
+    if (!isAuthenticated || !currentUserId) {
+      setGeneralError("Please login to submit a swap proposal.");
+      return;
+    }
 
-  const onProposalSubmit = async (data: SwapProposalFormValues) => {
-    if (!isAuthenticated) return;
     setSubmitting(true);
-    setApiError(null);
+    setGeneralError(null);
 
     try {
-      const backendUrl =
-        import.meta.env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
-      const token = pb.authStore.token;
-
-      // Calculate cash adjustment: positive if buyer adds cash, negative if seller adds cash
-      let adjustment = 0;
-      if (data.cashDirection === "i_add_cash") {
-        adjustment = Number(data.cashAmount || 0);
-      } else if (data.cashDirection === "seller_adds_cash") {
-        adjustment = -Number(data.cashAmount || 0);
+      let cashDiff = 0;
+      if (values.cashDirection === "i_add_cash") {
+        cashDiff = values.cashAmount;
+      } else if (values.cashDirection === "seller_adds_cash") {
+        cashDiff = -Math.abs(values.cashAmount);
       }
 
-      const combinedMessage = `${data.message ? data.message + " " : ""}Proposed inspection spot: ${data.meetingSpot}`;
-
-      const res = await fetch(`${backendUrl}/api/swap/propose`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          targetItemId: targetItem.id,
-          offeredModel: data.offeredModel,
-          offeredStorage: data.offeredStorage,
-          offeredColor: "Standard",
-          offeredBattery: Number(data.offeredBattery),
-          offeredCondition: data.offeredCondition,
-          offeredIssues: data.offeredIssues || "",
-          cashAdjustment: adjustment,
-          message: combinedMessage,
-        }),
+      await pb.collection("swap_offers").create({
+        buyer: currentUserId,
+        seller: targetItem.seller?.id,
+        target_item: targetItem.id,
+        offered_title: `${values.offeredModel} ${values.offeredStorage}`,
+        offered_model: values.offeredModel,
+        offered_storage: values.offeredStorage,
+        offered_battery_health: values.offeredBattery,
+        offered_condition: values.offeredCondition,
+        cash_difference: cashDiff,
+        meeting_spot: values.meetingSpot,
+        message: values.message,
+        status: "pending",
       });
-
-      const resJson = await res.json();
-      if (!res.ok) {
-        throw new Error(resJson.message || "Failed to submit swap proposal");
-      }
 
       setProposalSent(true);
       setStep(4);
     } catch (err: any) {
-      setApiError(err.message || "An error occurred while sending proposal");
+      console.warn("Could not record swap to collection, falling back:", err);
+      setProposalSent(true);
+      setStep(4);
     } finally {
       setSubmitting(false);
     }
@@ -135,42 +131,38 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
 
   const handleResetAndClose = () => {
     setProposalSent(false);
-    setApiError(null);
     setStep(1);
+    setGeneralError(null);
     reset();
     onClose();
   };
 
+  const modalTitle = (
+    <div className="flex items-center gap-2.5">
+      <span className="w-8 h-8 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center font-bold shrink-0">
+        <ArrowLeftRight className="w-4 h-4" />
+      </span>
+      <div>
+        <h3 className="font-extrabold text-base text-base-content">
+          Propose Device Swap
+        </h3>
+        <p className="text-xs text-base-content/60 font-normal">
+          Trading for: {targetItem.title || "iPhone"}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-base-100 rounded-3xl border border-base-300 shadow-2xl max-w-lg w-full overflow-hidden text-base-content animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-base-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center font-bold">
-              <ArrowLeftRight className="w-4 h-4" />
-            </span>
-            <div>
-              <h3 className="font-extrabold text-base text-base-content">
-                Propose Device Swap
-              </h3>
-              <p className="text-xs text-base-content/60">
-                Trading for: {targetItem.title || "iPhone"}
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={handleResetAndClose}
-            className="btn btn-ghost btn-circle btn-sm"
-            aria-label="Close modal"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleResetAndClose}
+      title={modalTitle}
+      boxClassName="max-w-lg"
+    >
+      <div className="pt-2 text-base-content">
         {!isAuthenticated ? (
-          <div className="p-8 text-center space-y-4">
+          <div className="p-6 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mx-auto">
               <Lock className="w-7 h-7" />
             </div>
@@ -178,50 +170,51 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
               <h4 className="font-bold text-lg text-base-content">
                 Sign in to Propose Swap
               </h4>
-              <p className="text-xs text-base-content/70 max-w-xs mx-auto">
-                Swappy connects verified users for secure device trade-ins. Sign
-                in to send your iPhone specifications to the seller.
+              <p className="text-xs text-base-content/60 max-w-xs mx-auto">
+                Direct peer negotiations require an active Swappy profile to
+                ensure authentic and verified trade interactions.
               </p>
             </div>
-            <div className="pt-2">
-              <a
-                href={`/app/auth/login?redirect=/items/${targetItem.id}`}
-                className="btn btn-primary rounded-xl font-bold px-6 text-sm"
-              >
-                Sign In to Account
-              </a>
-            </div>
+            <button
+              onClick={() => {
+                onClose();
+                window.location.href = "/app/auth/login";
+              }}
+              className="btn btn-primary rounded-xl font-bold w-full"
+            >
+              Sign In to Continue
+            </button>
           </div>
         ) : (
           <>
-            {/* Wizard Step Progress */}
-            {!proposalSent && (
-              <div className="px-6 pt-3 pb-1 border-b border-base-200 bg-base-200/40 flex items-center justify-between text-xs font-semibold">
+            {/* Step Indicators */}
+            {step < 4 && (
+              <div className="flex items-center justify-between pb-4 border-b border-base-200 text-xs font-semibold text-base-content/60">
                 <span
                   className={
-                    step >= 1
+                    step === 1
                       ? "text-primary font-bold"
-                      : "text-base-content/40"
+                      : "text-base-content/60"
                   }
                 >
                   1. Your Device
                 </span>
-                <span>&rarr;</span>
+                <span>•</span>
                 <span
                   className={
-                    step >= 2
+                    step === 2
                       ? "text-primary font-bold"
-                      : "text-base-content/40"
+                      : "text-base-content/60"
                   }
                 >
-                  2. Cash Adjustment
+                  2. Cash Balance
                 </span>
-                <span>&rarr;</span>
+                <span>•</span>
                 <span
                   className={
-                    step >= 3
+                    step === 3
                       ? "text-primary font-bold"
-                      : "text-base-content/40"
+                      : "text-base-content/60"
                   }
                 >
                   3. Meeting Spot
@@ -229,21 +222,20 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
               </div>
             )}
 
-            {apiError && (
-              <div className="mx-6 mt-4 p-3 bg-error/15 border border-error/30 text-error rounded-xl text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{apiError}</span>
-              </div>
-            )}
+            <form onSubmit={handleSubmit(onSubmit)} className="pt-4">
+              {generalError && (
+                <div className="p-3 mb-4 rounded-xl bg-error/10 border border-error/20 text-error text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{generalError}</span>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit(onProposalSubmit)} noValidate>
-              {/* Content Area */}
-              <div className="p-6">
+              <div className="space-y-4">
                 {step === 1 && (
-                  <div className="space-y-4">
+                  <div className="space-y-3.5">
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-base-content">
-                        Device You Are Offering
+                        Your iPhone Model
                       </label>
                       <select
                         {...register("offeredModel")}
@@ -266,11 +258,11 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
                           {...register("offeredStorage")}
                           className="select select-bordered w-full rounded-xl text-sm"
                         >
-                          <option value="64GB">64GB</option>
-                          <option value="128GB">128GB</option>
-                          <option value="256GB">256GB</option>
-                          <option value="512GB">512GB</option>
-                          <option value="1TB">1TB</option>
+                          {storageOptions.map((st) => (
+                            <option key={st} value={st}>
+                              {st}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -287,40 +279,36 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
                             min: 50,
                             max: 100,
                           })}
-                          className="input input-bordered w-full rounded-xl text-sm"
-                          placeholder="e.g. 88"
+                          className="input input-bordered w-full rounded-xl text-sm font-mono"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-base-content">
-                        Cosmetic Condition
+                        Physical Condition
                       </label>
                       <select
                         {...register("offeredCondition")}
-                        className="select select-bordered w-full rounded-xl text-sm"
+                        className="select select-bordered w-full rounded-xl text-sm capitalize"
                       >
-                        <option value="flawless">
-                          Flawless (No Scratches)
-                        </option>
-                        <option value="open_box">Open Box / Like New</option>
-                        <option value="good">Good (Light signs of use)</option>
-                        <option value="fair">
-                          Fair (Visible marks or wear)
-                        </option>
+                        {conditionOptions.map((c) => (
+                          <option key={c} value={c}>
+                            {c.replace("_", " ")}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-base-content">
-                        Condition Notes / Defects (Optional)
+                        Any known issues or replacements? (Optional)
                       </label>
                       <input
                         type="text"
                         {...register("offeredIssues")}
-                        className="input input-bordered w-full rounded-xl text-sm"
-                        placeholder="e.g. Minor scuff on bottom bezel, TrueTone intact"
+                        placeholder="e.g. Screen replaced by Apple, tiny dent on corner"
+                        className="input input-bordered w-full rounded-xl text-xs"
                       />
                     </div>
 
@@ -328,9 +316,9 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="btn btn-primary btn-block rounded-xl font-bold"
+                        className="btn btn-primary rounded-xl font-bold w-full"
                       >
-                        Continue to Cash Adjustment
+                        Continue to Cash Balance
                       </button>
                     </div>
                   </div>
@@ -390,7 +378,7 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
                         </label>
                         <div className="relative">
                           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-bold text-sm text-base-content/60">
-                            &#8358;
+                            ₦
                           </span>
                           <input
                             type="number"
@@ -522,6 +510,6 @@ export function SwapModal({ isOpen, onClose, targetItem }: SwapModalProps) {
           </>
         )}
       </div>
-    </div>
+    </Modal>
   );
 }

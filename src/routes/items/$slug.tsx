@@ -328,7 +328,7 @@ function ItemDetailPage() {
         itemIdentifier={item.id}
         itemTitle={item.title || "iPhone"}
         sellerName={item.seller?.name || "Seller"}
-        sellerId={item.seller?.id}
+        sellerId={sellerId}
       />
 
       {/* Write a Review Modal */}
