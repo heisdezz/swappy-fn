@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Save,
   ShieldCheck,
+  Wrench,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -34,10 +35,12 @@ interface EditPhoneFormValues {
   battery_health: number;
   condition: string;
   carrier_status: string;
+  sim_type: string;
   has_face_id: boolean;
   has_truetone: boolean;
   accepts_swap: boolean;
   swap_preferences: string;
+  issues: string;
   location_city: string;
   location_state: string;
   status: "active" | "paused" | "sold";
@@ -67,6 +70,14 @@ const IPHONE_MODELS = [
   "iPhone 11 Pro Max",
   "iPhone 11 Pro",
   "iPhone 11",
+  "iPhone XS Max",
+  "iPhone XS",
+  "iPhone XR",
+  "iPhone X",
+  "iPhone SE (3rd Gen)",
+  "iPhone SE (2nd Gen)",
+  "iPhone 8 Plus",
+  "iPhone 8",
 ];
 
 const STORAGE_OPTIONS = ["64GB", "128GB", "256GB", "512GB", "1TB"];
@@ -122,6 +133,7 @@ function EditPhoneForm({ record }: { record: any }) {
         typeof record.battery_health === "number" ? record.battery_health : 92,
       condition: record.condition || "flawless",
       carrier_status: record.carrier_status || "factory_unlocked",
+      sim_type: record.sim_type || "physical_sim_plus_esim",
       has_face_id:
         typeof record.has_face_id === "boolean" ? record.has_face_id : true,
       has_truetone:
@@ -129,6 +141,7 @@ function EditPhoneForm({ record }: { record: any }) {
       accepts_swap:
         typeof record.accepts_swap === "boolean" ? record.accepts_swap : true,
       swap_preferences: record.swap_preferences || "",
+      issues: record.issues || "None / 100% Original",
       location_city: record.location_city || "Ikeja",
       location_state: record.location_state || "Lagos",
       status: (record.status as "active" | "paused" | "sold") || "active",
@@ -155,10 +168,12 @@ function EditPhoneForm({ record }: { record: any }) {
       formData.append("battery_health", String(Number(data.battery_health)));
       formData.append("condition", data.condition);
       formData.append("carrier_status", data.carrier_status);
+      formData.append("sim_type", data.sim_type || "physical_sim_plus_esim");
       formData.append("has_face_id", String(Boolean(data.has_face_id)));
       formData.append("has_truetone", String(Boolean(data.has_truetone)));
       formData.append("accepts_swap", String(Boolean(data.accepts_swap)));
       formData.append("swap_preferences", data.swap_preferences || "");
+      formData.append("issues", data.issues || "");
       formData.append("location_city", data.location_city);
       formData.append("location_state", data.location_state);
       formData.append("status", data.status);
@@ -178,6 +193,7 @@ function EditPhoneForm({ record }: { record: any }) {
 
       queryClient.invalidateQueries({ queryKey: ["phone", record.id] });
       queryClient.invalidateQueries({ queryKey: ["my-phones"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-data"] });
       setSaveSuccess(true);
       setTimeout(() => {
         setSaveSuccess(false);
@@ -198,77 +214,95 @@ function EditPhoneForm({ record }: { record: any }) {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Top Navigation & Actions Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        {/* Top Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-base-200">
+          <div className="space-y-1">
             <Link
               to="/dashboard/phones"
-              className="btn btn-ghost btn-sm btn-circle"
-              aria-label="Back to My Phones"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-base-content/65 hover:text-primary transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to My Listings</span>
             </Link>
-            <div>
+            <div className="flex items-center gap-3">
               <h1 className="text-xl sm:text-2xl font-black text-base-content tracking-tight">
-                Edit iPhone Listing
+                Edit Listing
               </h1>
-              <p className="text-xs text-base-content/60 mt-0.5">
-                Update hardware specifications, price, photos, or trade
-                preferences
-              </p>
+              <span
+                className={`badge badge-sm font-bold capitalize ${
+                  record.status === "active"
+                    ? "badge-success text-success-content"
+                    : record.status === "sold"
+                      ? "badge-neutral"
+                      : "badge-warning text-warning-content"
+                }`}
+              >
+                {record.status}
+              </span>
             </div>
+            <p className="text-xs sm:text-sm text-base-content/70">
+              Update photos, price adjustments, and inspection terms for this
+              iPhone.
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
             <Link
-              to={"/items/$slug" as string}
-              params={{ slug: itemSlug }}
+              to={`/items/${itemSlug}` as string}
               className="btn btn-ghost btn-sm rounded-xl font-bold text-xs inline-flex items-center gap-1.5"
-              target="_blank"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Public View</span>
+              <span>View Public Page</span>
             </Link>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-primary btn-sm rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm text-xs"
+              className="btn btn-primary btn-sm rounded-xl font-black text-xs inline-flex items-center gap-1.5 shadow-sm"
             >
               {isSubmitting ? (
-                <span className="loading loading-spinner loading-xs" />
+                <>
+                  <span className="loading loading-spinner loading-xs" />
+                  <span>Saving...</span>
+                </>
               ) : (
-                <Save className="w-3.5 h-3.5" />
+                <>
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save Changes</span>
+                </>
               )}
-              <span>Save Changes</span>
             </button>
           </div>
         </div>
 
-        {/* Notification Banners */}
+        {/* Alerts */}
         {saveSuccess && (
-          <div className="alert alert-success rounded-2xl text-xs font-bold text-success-content flex items-center gap-2 shadow-sm">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>Listing updated successfully on Swappy.</span>
+          <div className="alert alert-success rounded-3xl p-4 shadow-xs text-xs sm:text-sm font-bold text-success-content flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 shrink-0" />
+            <span>Changes saved successfully to Swappy marketplace!</span>
           </div>
         )}
 
         {errorMessage && (
-          <div className="alert alert-error rounded-2xl text-xs font-bold text-error-content flex items-center gap-2 shadow-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="alert alert-error rounded-3xl p-4 shadow-xs text-xs sm:text-sm font-bold text-error-content flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        {/* Two-Column Form Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Core Specs (2 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main 2 Cols */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Device Photography with UpdateImages */}
+            {/* Photos Update */}
             <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
-              <h2 className="font-extrabold text-sm sm:text-base text-base-content pb-2 border-b border-base-200">
-                Listing Photos
-              </h2>
+              <div className="flex items-center justify-between pb-2 border-b border-base-200">
+                <h2 className="font-extrabold text-sm sm:text-base text-base-content">
+                  Listing Photos
+                </h2>
+                <span className="text-xs text-base-content/60">
+                  {existingImages.length + newFiles.length} photos
+                </span>
+              </div>
               <UpdateImages
                 images={existingImages}
                 setPrev={setExistingImages}
@@ -276,31 +310,33 @@ function EditPhoneForm({ record }: { record: any }) {
               />
             </div>
 
-            {/* Basic Details Card */}
-            <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
+            {/* Specifications Card */}
+            <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-5 shadow-xs">
               <h2 className="font-extrabold text-sm sm:text-base text-base-content pb-2 border-b border-base-200">
-                Device Specifications
+                Core Specifications
               </h2>
 
               <SimpleInput
                 label="Listing Title"
-                placeholder="e.g. iPhone 15 Pro Max 256GB Natural Titanium Clean US Used"
-                {...register("title", { required: "Title is required" })}
+                placeholder="e.g. iPhone 15 Pro 128GB Natural Titanium Factory Unlocked"
+                {...register("title", {
+                  required: "Listing title is required",
+                })}
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <LocalSelect label="iPhone Model" {...register("model")}>
-                  {IPHONE_MODELS.map((model) => (
-                    <option key={model} value={model}>
-                      {model}
+                  {IPHONE_MODELS.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
                     </option>
                   ))}
                 </LocalSelect>
 
-                <LocalSelect label="Storage Capacity" {...register("storage")}>
-                  {STORAGE_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
+                <LocalSelect label="Storage" {...register("storage")}>
+                  {STORAGE_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
                     </option>
                   ))}
                 </LocalSelect>
@@ -333,7 +369,7 @@ function EditPhoneForm({ record }: { record: any }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <LocalSelect
                   label="Cosmetic Condition"
                   {...register("condition")}
@@ -342,16 +378,28 @@ function EditPhoneForm({ record }: { record: any }) {
                   <option value="open_box">Open Box (Like New)</option>
                   <option value="good">Good (Light Wear)</option>
                   <option value="fair">Fair (Visible Scuffs)</option>
-                  <option value="cracked">Cracked Back Glass</option>
+                  <option value="cracked_screen">Cracked Glass</option>
+                  <option value="for_parts">For Parts / Faulty</option>
                 </LocalSelect>
 
                 <LocalSelect
-                  label="Network Carrier Status"
+                  label="Carrier Status"
                   {...register("carrier_status")}
                 >
                   <option value="factory_unlocked">Factory Unlocked</option>
                   <option value="chip_unlocked">Chip Unlocked</option>
-                  <option value="carrier_locked">Carrier Locked</option>
+                  <option value="network_locked">Carrier Locked</option>
+                </LocalSelect>
+
+                <LocalSelect label="SIM Variant" {...register("sim_type")}>
+                  <option value="physical_sim_plus_esim">
+                    Nano-SIM + eSIM
+                  </option>
+                  <option value="dual_physical_sim">
+                    Dual Physical Nano-SIM (HK/China)
+                  </option>
+                  <option value="dual_esim">Dual eSIM Only (US Model)</option>
+                  <option value="single_esim">Single eSIM</option>
                 </LocalSelect>
               </div>
             </div>
@@ -397,6 +445,22 @@ function EditPhoneForm({ record }: { record: any }) {
               </div>
             </div>
 
+            {/* Known Issues & Disclosure */}
+            <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
+              <div className="flex items-center gap-2 pb-2 border-b border-base-200">
+                <Wrench className="w-4 h-4 text-warning" />
+                <h2 className="font-extrabold text-sm sm:text-base text-base-content">
+                  Known Issues & Disclosures
+                </h2>
+              </div>
+
+              <SimpleInput
+                label="Defects, Past Repairs or Replaced Components"
+                placeholder="e.g. None / 100% Original, or Screen replaced OEM"
+                {...register("issues")}
+              />
+            </div>
+
             {/* Description & Trade Preferences */}
             <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
               <h2 className="font-extrabold text-sm sm:text-base text-base-content pb-2 border-b border-base-200">
@@ -428,53 +492,80 @@ function EditPhoneForm({ record }: { record: any }) {
               )}
 
               <SimpleTextArea
-                label="Description & Inspection Notes"
+                label="Detailed Description"
+                placeholder="Include details about cosmetic state, accessories (box, charger), and testing terms..."
                 rows={4}
-                placeholder="Describe cosmetic condition, accessories included, original box, and reason for selling..."
                 {...register("description")}
               />
             </div>
           </div>
 
-          {/* Right Column: Listing Status & Location (1 col) */}
-          <div className="space-y-6">
-            {/* Status & Visibility Card */}
+          {/* Right Column: Status & Location */}
+          <div className="lg:col-span-1 space-y-6">
             <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
               <h2 className="font-extrabold text-sm sm:text-base text-base-content pb-2 border-b border-base-200">
-                Listing Status
+                Listing Availability
               </h2>
 
-              <LocalSelect label="Publishing Status" {...register("status")}>
-                <option value="active">Active (Visible to Buyers)</option>
-                <option value="paused">Paused (Temporarily Hidden)</option>
-                <option value="sold">Sold (Completed Trade)</option>
+              <LocalSelect label="Listing Status" {...register("status")}>
+                <option value="active">Active (Visible on marketplace)</option>
+                <option value="paused">Paused (Temporarily hidden)</option>
+                <option value="sold">Sold (Mark as deal closed)</option>
+              </LocalSelect>
+            </div>
+
+            <div className="bg-base-100 rounded-3xl border border-base-300 p-6 space-y-4 shadow-xs">
+              <h2 className="font-extrabold text-sm sm:text-base text-base-content pb-2 border-b border-base-200">
+                Inspection Location
+              </h2>
+
+              <LocalSelect label="State" {...register("location_state")}>
+                <option value="Lagos">Lagos</option>
+                <option value="Abuja">Abuja</option>
+                <option value="Rivers">Rivers</option>
+                <option value="Oyo">Oyo</option>
+                <option value="Enugu">Enugu</option>
+                <option value="Delta">Delta</option>
+                <option value="Edo">Edo</option>
+                <option value="Kano">Kano</option>
+                <option value="Ogun">Ogun</option>
               </LocalSelect>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <SimpleInput
-                  label="City"
-                  placeholder="e.g. Ikeja"
-                  {...register("location_city")}
-                />
-                <SimpleInput
-                  label="State"
-                  placeholder="e.g. Lagos"
-                  {...register("location_state")}
-                />
-              </div>
+              <SimpleInput
+                label="City / Market Area"
+                placeholder="e.g. Ikeja, Lekki Phase 1, Banex"
+                {...register("location_city", { required: "City is required" })}
+              />
             </div>
 
-            {/* Safety & Physical Pickup Reminder */}
-            <div className="bg-primary/10 rounded-3xl border border-primary/20 p-5 space-y-2">
-              <div className="flex items-center gap-2 font-bold text-xs text-base-content">
-                <ShieldCheck className="w-4 h-4 text-primary" />
-                <span>Safe Trading Protocol</span>
+            <div className="bg-base-200/50 rounded-3xl border border-base-300 p-5 space-y-2 text-xs text-base-content/70">
+              <div className="flex items-center gap-2 font-bold text-base-content">
+                <ShieldCheck className="w-4 h-4 text-success" />
+                <span>Swappy Quality Standard</span>
               </div>
-              <p className="text-[11px] text-base-content/75 leading-relaxed">
-                Always conduct trades in public physical locations such as
-                Computer Village or Banex Plaza dealer shops.
+              <p>
+                Listings with accurate battery health and verified descriptions
+                have a 92% higher completion rate during in-person inspection.
               </p>
             </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn btn-primary btn-block h-12 rounded-2xl font-black text-sm shadow-md inline-flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="loading loading-spinner loading-sm" />
+                  <span>Saving Changes...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Save Listing Changes</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </form>
