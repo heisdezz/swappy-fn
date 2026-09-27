@@ -15,6 +15,7 @@ import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as StoresRouteImport } from './routes/stores'
 import { Route as AppAuthRouteRouteImport } from './routes/app/auth/route'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardMessagesRouteImport } from './routes/dashboard/messages'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStoresRouteImport } from './routes/dashboard/stores'
 import { Route as ItemsSlugRouteImport } from './routes/items/$slug'
@@ -54,6 +55,11 @@ const AppAuthRouteRoute = AppAuthRouteRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardMessagesRoute = DashboardMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/stores': typeof StoresRoute
   '/app/auth': typeof AppAuthRouteRouteWithChildren
+  '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/stores': typeof DashboardStoresRoute
   '/items/$slug': typeof ItemsSlugRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/messages'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/messages'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/stores'
     | '/app/auth'
+    | '/dashboard/messages'
     | '/dashboard/settings'
     | '/dashboard/stores'
     | '/items/$slug'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/messages': {
+      id: '/dashboard/messages'
+      path: '/messages'
+      fullPath: '/dashboard/messages'
+      preLoaderRoute: typeof DashboardMessagesRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/settings': {
@@ -346,6 +365,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteRouteChildren {
+  DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardStoresRoute: typeof DashboardStoresRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -355,6 +375,7 @@ interface DashboardRouteRouteChildren {
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardStoresRoute: DashboardStoresRoute,
   DashboardIndexRoute: DashboardIndexRoute,

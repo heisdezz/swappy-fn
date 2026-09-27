@@ -134,7 +134,7 @@ export function ItemChatDrawer({
           },
           body: JSON.stringify({
             text: textToSend,
-            recipient: sellerId,
+            recipient: (sellerId && sellerId !== "usr-seller-1") ? sellerId : undefined,
           }),
         },
       );

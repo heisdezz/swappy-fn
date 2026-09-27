@@ -146,7 +146,7 @@ function sanitizeDetailRecord(item: Record<string, unknown>): ItemDetailRecord {
     views: typeof item.views === "number" ? item.views : 142,
     category: item.category ? String(item.category) : undefined,
     seller: {
-      id: seller?.id ? String(seller.id) : "usr-seller-1",
+      id: seller?.id ? String(seller.id) : (item.seller ? String(item.seller) : ""),
       name: sellerName,
       username: seller?.username ? String(seller.username) : undefined,
       phone: sellerPhone,

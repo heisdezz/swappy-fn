@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquare,
   Moon,
   Plus,
   RefreshCw,
@@ -19,7 +20,8 @@ import { pb } from "../../client/pb";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  activeTab?: "overview" | "listings" | "swaps" | "store" | "settings";
+  activeTab?:
+    "overview" | "listings" | "swaps" | "messages" | "store" | "settings";
 }
 
 export function DashboardLayout({
@@ -29,6 +31,7 @@ export function DashboardLayout({
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(pb.authStore.record);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,6 +50,37 @@ export function DashboardLayout({
     });
     return () => unsub();
   }, []);
+
+  // Fetch unread messages count for logged-in user
+  useEffect(() => {
+    const userId = pb.authStore.record?.id;
+    if (!userId) return;
+
+    const checkUnread = async () => {
+      try {
+        const res = await pb.collection("messages").getList(1, 1, {
+          filter: `recipient = "${userId}" && read = false`,
+          requestKey: null,
+        });
+        setUnreadCount(res.totalItems);
+      } catch {
+        // quiet ignore
+      }
+    };
+
+    checkUnread();
+
+    // Subscribe to incoming messages
+    const unsubPromise = pb.collection("messages").subscribe("*", (e) => {
+      if (e.record.recipient === userId) {
+        checkUnread();
+      }
+    });
+
+    return () => {
+      unsubPromise.then((unsub) => unsub()).catch(() => {});
+    };
+  }, [currentUser]);
 
   const toggleTheme = () => {
     const nextTheme = theme === "light" ? "dark" : "light";
@@ -73,6 +107,14 @@ export function DashboardLayout({
       icon: Smartphone,
       to: "/dashboard/phones",
       badge: "Manage",
+    },
+    {
+      id: "messages",
+      label: "Chat Messages",
+      icon: MessageSquare,
+      to: "/dashboard/messages",
+      badge: unreadCount > 0 ? `${unreadCount} new` : undefined,
+      badgeColor: unreadCount > 0 ? "badge-primary" : undefined,
     },
     {
       id: "swaps",
@@ -140,7 +182,7 @@ export function DashboardLayout({
                       className={`badge badge-xs font-bold text-[10px] px-2 py-0.5 ${
                         isActive
                           ? "bg-primary-content/20 text-primary-content border-transparent"
-                          : "badge-neutral"
+                          : item.badgeColor || "badge-neutral"
                       }`}
                     >
                       {item.badge}
@@ -260,7 +302,7 @@ export function DashboardLayout({
               )}
             </button>
 
-            {/* Quick Post Action - Now links directly to /dashboard/phones/new */}
+            {/* Quick Post Action */}
             <Link
               to="/dashboard/phones/new"
               className="btn btn-primary btn-sm h-10 px-4 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm text-xs sm:text-sm"
@@ -312,7 +354,9 @@ export function DashboardLayout({
                           <span>{item.label}</span>
                         </div>
                         {item.badge && (
-                          <span className="badge badge-neutral badge-xs font-bold">
+                          <span
+                            className={`badge badge-xs font-bold ${item.badgeColor || "badge-neutral"}`}
+                          >
                             {item.badge}
                           </span>
                         )}
